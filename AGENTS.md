@@ -154,6 +154,26 @@ When adding or changing a major component, update:
 3. `docs/MASTER-PLAN.md`, if the change settles or reopens an architecture decision.
 4. Tests covering the new or changed behaviour.
 
+## Code review
+
+Evaluate the code based on the following aspects:
+- Adherence to the documented specs and requirements
+- Code quality and adherence to best practices
+- Code smells (redundancy, overly complex logic, tight coupling)
+- Adherence to naming conventions and stylistic consistency with the rest of the repo.
+- Potential bugs or unhandled edge cases
+- Performance optimizations
+- Readability and maintainability
+- Any security vulnerabilities
+- Test coverage adequacy
+
+In your output:
+- Begin with a brief summary of the overall code quality
+- Line numbers start at 1, based on the code as presented
+- Clear improvement suggessions for each finding
+
+If no issues are found, briefly state that the code meets best practices.
+
 ## Definition of done
 
 A change is ready when:
