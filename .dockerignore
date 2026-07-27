@@ -1,0 +1,11 @@
+# Only docker/entrypoint.sh is COPYed into the image, so keep the build
+# context minimal - node_modules alone is hundreds of megabytes.
+node_modules
+.expo
+.git
+.github
+dist
+web-build
+*.log
+.env*
+README.md

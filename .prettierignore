@@ -1,0 +1,11 @@
+node_modules/
+dist/
+web-build/
+coverage/
+.expo/
+package-lock.json
+assets/
+
+# Prose is hand-formatted. Prettier pads Markdown tables to equal-width cells,
+# which pushes doc lines past 400 characters and makes every edit a churn diff.
+*.md

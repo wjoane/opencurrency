@@ -1,0 +1,9 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    // "jest" provides describe/it/expect; the RNTL entry adds its custom
+    // matchers (toBeOnTheScreen, toHaveTextContent, ...) to expect().
+    "types": ["jest", "@testing-library/react-native"]
+  }
+}
