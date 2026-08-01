@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This file defines implementation guidance for the React Native app `opencurrencyconverter`.
+This file defines implementation guidance for the React Native app `opencurrency`.
 
 Read [`docs/MASTER-PLAN.md`](docs/MASTER-PLAN.md) before starting work. It holds the
 architecture decisions and, just as importantly, records which decisions are still
@@ -23,6 +23,7 @@ answer — raise it.
 - Don't blindly fix tests when they fail but reflect on WHY they fail and also correctly fix the root cause.
 - Think step by step before giving any verdict.
 - Prefer small, reviewable commits.
+- Keep simple fixes narrowly scoped.
 - Do not silently change public interfaces, environment variables, or the Expo/Docker configuration.
 - When changing behavior, update tests and documentation in the same change.
 - Do not introduce new dependencies without a reason and without updating the relevant documentation.
@@ -99,6 +100,15 @@ Stack: **Jest** with the `jest-expo` preset, and **React Native Testing Library*
   ```tsx
   await render(<App />);
   expect(screen.getByText(/…/)).toBeOnTheScreen();
+  ```
+
+- **`fireEvent` is async for the same reason, and is the easier one to miss.** An
+  un-awaited press leaves the state update unflushed, so the assertion that follows
+  reads the *previous* render and the test fails for a reason that has nothing to do
+  with the component.
+
+  ```tsx
+  await fireEvent.press(screen.getByRole('button', { name: 'Close' }));
   ```
 
 - Test behaviour through the public surface: query by text, role and accessibility

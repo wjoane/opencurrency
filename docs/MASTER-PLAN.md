@@ -1,8 +1,9 @@
-# Master Plan — Open Currency Converter
+# Master Plan — Open Currency
 
-> **Status: active.** The product scope and every architecture decision that blocks it
-> were settled on 2026-07-27. §4 is authoritative; §5 now lists only what genuinely
-> remains open.
+> **Status: implementation complete.** The product scope and every architecture
+> decision that blocks the implementation were settled on 2026-07-27. The complete
+> first-version app is implemented on `main`; release-account, device, and CI
+> verification remain operational follow-ups rather than unfinished product work.
 
 ## 1. Purpose
 
@@ -24,12 +25,36 @@ Someone comparing several currencies at once — a traveller, or anyone pricing 
 thing in more than two currencies. The multi-row simultaneous view is the differentiator
 against the two-field converter every phone already has.
 
+### Implementation summary
+
+The first version is implemented as a single-screen Expo application with transient
+modals for settings, currency selection, rate information, and historical dates. It
+currently provides:
+
+- EUR-based exchange-rate loading over HTTPS with provider fallback, response
+  validation, permanent per-date caching, LRU eviction, stale/offline handling, and a
+  dated bundled snapshot for first-launch use.
+- Exact decimal conversion and display formatting using `big.js`, ISO-4217 minor
+  units, locale separators, shipped symbols/metadata, and safe fallbacks for crypto
+  and metal codes.
+- Currency addition, deletion, and drag reordering, with a minimum of two rows;
+  amount editing accepts either decimal separator and keeps the active input raw.
+- Persisted preferences for currencies, order, amount, active currency, theme, and
+  language, with light/dark/system themes and live RTL layout mirroring.
+- A typed hand-rolled localisation layer covering 27 locales, native date picking
+  with a web fallback, accessibility labels, branded assets, and a comprehensive
+  Jest/React Native Testing Library suite.
+
+The implementation is feature-complete for the planned first version. A production
+release build has not yet been exercised; release-account, device, and CI verification
+remain operational follow-ups rather than missing application features.
+
 ## 2. How these documents work
 
 | Document | Contains |
 | --- | --- |
-| `MASTER-PLAN.md` (this file) | Architecture decisions, system structure, milestone index. The stable "what and why". |
-| `M<NN>-<name>.md` | One per milestone: the step-by-step implementation plan, live progress tracking, and a record of what was implemented vs. deferred. The "how and when". |
+| `MASTER-PLAN.md` (this file) | Architecture decisions, system structure, implementation summary, and milestone index. The stable "what and why". |
+| `M<NN>-<name>.md` | Optional per-milestone detail: the step-by-step implementation plan, live progress tracking, and a record of what was implemented vs. deferred. |
 
 Conventions:
 
@@ -46,21 +71,22 @@ Conventions:
 
 | # | Milestone | Status | Document |
 | --- | --- | --- | --- |
-| M01 | Development environment | ✅ Complete (pending device verification) | [M01-development-environment.md](./M01-development-environment.md) |
-| M02 | Quality tooling and agent conventions | ✅ Complete | [M02-quality-tooling.md](./M02-quality-tooling.md) |
-| M03 | Foundations and domain core | 📋 Planned | [M03-foundations.md](./M03-foundations.md) |
-| M04 | Rates and the converter screen | 📋 Planned | [M04-converter.md](./M04-converter.md) |
-| M05 | Currency management and historical dates | 📋 Planned | [M05-list-and-dates.md](./M05-list-and-dates.md) |
-| M06 | Localisation, settings, polish and release | 📋 Planned | [M06-localisation-and-release.md](./M06-localisation-and-release.md) |
+| M01 | Development environment | ✅ Complete (device verification pending) | — |
+| M02 | Quality tooling and agent conventions | ✅ Complete | — |
+| M03 | Foundations and domain core | ✅ Complete | — |
+| M04 | Rates and the converter screen | ✅ Complete | — |
+| M05 | Currency management and historical dates | ✅ Complete | — |
+| M06 | Localisation, settings, polish and release | ✅ Implementation complete (release build pending) | — |
 
-The four remaining milestones are deliberately coarse. Each is delivered as a series
-of small, individually reviewable commits listed in its own document, rather than as
-one large change.
+The implementation was delivered as one completed feature change after the initial
+environment and planning work. The milestone split remains as a historical index of
+the workstreams; no milestone is still awaiting implementation.
 
-**Ordering rationale.** M03 front-loads the pure domain layer and a runtime capability
-spike, because the money representation constrains every screen and because Hermes's
-partial `Intl` support can invalidate two formatting decisions. M04 then proves the
-network → cache → conversion → screen path end to end. M05 and M06 broaden it.
+**Ordering rationale.** M03 front-loaded the pure domain layer and runtime capability
+checks because the money representation constrains every screen and Hermes's partial
+`Intl` support affects formatting. M04 proved the network → cache → conversion →
+screen path end to end; M05 and M06 then completed currency management, dates,
+localisation, settings, polish, and release configuration.
 
 ## 4. Architecture decisions — settled
 
@@ -87,8 +113,8 @@ network → cache → conversion → screen path end to end. M05 and M06 broaden
 | # | Decision | Choice | Why |
 | --- | --- | --- | --- |
 | 1 | Shipping platforms | **Android + iOS**. Web must keep running as the local preview but may degrade | Web is the only surface that runs on the development machine, so it cannot be allowed to break — but it is not a product target, which frees the choice of native-first libraries. |
-| 2 | Currency universe | **All ~430 codes the provider returns**, including crypto, metals and defunct currencies | User's explicit call. Filtering to ISO-4217 fiat was offered and declined. The cost is that precision, symbols and icons all need a fallback path for codes with no country and no minor-unit definition — which the decisions below supply. |
-| 3 | Removing a currency | **Swipe-to-delete**, minimum two rows | The expected mobile idiom. No gesture conflict: vertical drag is confined to the row's drag handle, so a horizontal swipe on the rest of the row is unambiguous. Degrades on web — accepted, see §5. |
+| 2 | Currency universe | **ISO-4217 monetary codes plus the curated popular cryptocurrencies**, including metals | Keeps the picker focused on currencies users can meaningfully add while retaining fiat, metals and the selected major crypto assets. Provider-only tokens, withdrawn codes and special-purpose ISO codes are omitted from the bundled data. |
+| 3 | Removing a currency | **Swipe-to-delete**, minimum two rows | The expected mobile idiom. Whole-row reordering requires a 500 ms hold before its vertical pan activates, while the horizontal delete gesture remains immediate. Degrades on web — accepted, see §5. |
 
 ### 4.3 Exchange-rate data
 
@@ -130,7 +156,7 @@ Free, no API key, no rate limits, no attribution requirement.
 | 24 | Persisted across launches | Theme, language, currency list and order, last amount and active currency. **Not** the selected date | A past date silently surviving a cold start would show old rates without the user having asked for them. |
 | 25 | Offline / stale | The newest cached snapshot stays on screen with an explicit stale indicator | Conversion must work offline. Staleness is surfaced, never hidden. |
 | 26 | Failed historical fetch | Keeps the current snapshot and the current header date, and surfaces an explicit error. **Never substitutes another date's rates** | Silently showing a different day's rates is a correctness bug dressed up as resilience. |
-| 27 | Cold start | Ship a generated `currencies.seed.json` (code→name). **Never ship seeded rates** | Makes the picker and metadata work offline from first launch, for ~7 KB. Seeded rates would age with the release and display as real. |
+| 27 | Cold start | Ship generated `app-data.json`, grouped by currency: name, EUR rate, minor units, symbol, resolved country code and availability, from the **2026-08-01** snapshot | Makes first launch fully usable offline from one validated data asset. The rate snapshot carries its provider date, is rendered as that date, and is only the fallback while the normal latest-rate refresh remains unavailable; it is never represented as current data. |
 
 ### 4.6 Application structure and presentation
 
@@ -148,17 +174,17 @@ Free, no API key, no rate limits, no attribution requirement.
 
 | # | Decision | Choice | Why |
 | --- | --- | --- | --- |
-| 35 | Scope | **Full UI translation, 25 locales**, defaulting to the system locale | User's explicit call, chosen over a formatting-only setting. |
+| 35 | Scope | **Full UI translation, 27 locales**, defaulting to the system locale | User's explicit call, chosen over a formatting-only setting. |
 | 36 | i18n mechanism | Hand-rolled typed `t()` over JSON catalogues | The string set is small. A library adds a dependency and a dependence on `Intl.PluralRules`, whose Hermes support is exactly what decision #38 flags as uncertain. |
-| 37 | RTL (`ar`, `he`, `fa`) | **Full mirroring** via `I18nManager` and logical `start`/`end` layout props, with `expo-updates` `reloadAsync()` behind a confirmation when the direction changes | React Native cannot flip layout direction without restarting. An Arabic UI in a left-to-right layout reads as broken to a native speaker, so direction has to actually change. `knip.json` already anticipates `expo-updates`. |
-| 38 | Currency names | `Intl.DisplayNames`, guarded, falling back to the provider's English name | Localised names for every ISO code in all 25 locales with no shipped strings. Hermes's `Intl` implementation is partial, and `DisplayNames` throws for non-three-letter codes such as `1inch` — hence the guard, and hence the spike that opens M03. |
+| 37 | RTL (`ar`, `he`, `fa`) | **Live full mirroring without a restart**. The root application view follows the selected locale's `direction`; feature layouts use logical `start`/`end` props and locale-derived gesture direction. `I18nManager` is reconciled for native defaults and future launches, but no reload is requested | `I18nManager` cannot flip the native default direction live, so it is not the rendered tree's source of truth. Keeping direction in locale-driven React state lets the mounted application mirror immediately in both directions without interrupting the user. |
+| 38 | Currency names | `Intl.DisplayNames`, guarded, falling back to the provider's English name | Localised names for every ISO code in all 27 locales with no shipped strings. Hermes's `Intl` implementation is partial, and `DisplayNames` throws for non-three-letter codes such as `1inch` — hence the guard, and hence the spike that opens M03. |
 
 ## 5. Architecture decisions — open
 
 | Area | Question |
 | --- | --- |
 | Release | Android `applicationId` and iOS bundle identifier — needed before the first EAS build |
-| Release | Signing, distribution channel, and whether over-the-air updates are used beyond the RTL reload |
+| Release | Signing, distribution channel, and whether over-the-air updates are used |
 | Quality | CI — still blocked on there being a git remote |
 | Quality | Whether `make check` is enforced by a pre-commit hook |
 | Quality | Coverage thresholds |
@@ -189,8 +215,8 @@ src/
   ui/                  reusable primitives, no feature knowledge
   features/converter/  screen-level components
 assets/
-  flags/<cc>.webp      generated, committed
-  currencies.seed.json generated, committed
+  flags/<cc>.webp      committed release assets
+  app-data.json            committed release seed — data grouped by currency, including rates
 ```
 
 **Data flow.** `RatesContext` asks `RateRepository` for a date. The repository consults
@@ -207,11 +233,11 @@ nothing but `big.js`, which is what makes it testable without a renderer.
 | --- | --- |
 | Offline | Full conversion from cached rates, with the staleness visible |
 | Network use | One request per date, ever. Typically one per day |
-| Cold start | Usable without network from first launch (seeded currency list, empty-rate state) |
+| Cold start | Usable without network from first launch (seeded currency list and dated rate snapshot) |
 | Storage footprint | ≤ ~1 MB of cached rates (180 snapshots), bounded by LRU |
 | Bundle | Flag assets under ~500 KB total; measured in M04 |
 | Accessibility | Every control labelled; the active row distinguishable by more than colour |
-| Localisation | 25 locales, three of them RTL |
+| Localisation | 27 locales, three of them RTL |
 | Platforms | Android and iOS; web renders and converts without crashing |
 
 ## 8. Open questions

@@ -4,6 +4,12 @@
     "strict": true,
     // "jest" provides describe/it/expect; the RNTL entry adds its custom
     // matchers (toBeOnTheScreen, toHaveTextContent, ...) to expect().
-    "types": ["jest", "@testing-library/react-native"]
+    //
+    // "expo/types" types Metro's `require`, which the generated flag asset map
+    // calls with a literal path. Normally expo-env.d.ts references it, but that
+    // file is generated and gitignored, and naming "types" at all suppresses
+    // automatic inclusion — so it has to be listed here to be present in a
+    // clean checkout.
+    "types": ["jest", "@testing-library/react-native", "expo/types"]
   }
 }

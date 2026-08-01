@@ -1,0 +1,1573 @@
+{
+  "rateDate": "2026-08-01",
+  "currencies": {
+    "aave": {
+      "name": "Aave",
+      "rate": 0.012495463,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "ada": {
+      "name": "Cardano",
+      "rate": 6.7776081,
+      "minorUnits": null,
+      "symbol": "₳",
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "aed": {
+      "name": "Emirati Dirham",
+      "rate": 4.23407501,
+      "minorUnits": 2,
+      "symbol": "د.إ",
+      "countryCode": "ae",
+      "isIso4217": true
+    },
+    "afn": {
+      "name": "Afghan Afghani",
+      "rate": 75.99727658,
+      "minorUnits": 2,
+      "symbol": "؋",
+      "countryCode": "af",
+      "isIso4217": true
+    },
+    "algo": {
+      "name": "Algorand",
+      "rate": 14.5000279,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "all": {
+      "name": "Albanian Lek",
+      "rate": 93.59819761,
+      "minorUnits": 2,
+      "symbol": "L",
+      "countryCode": "al",
+      "isIso4217": true
+    },
+    "amd": {
+      "name": "Armenian Dram",
+      "rate": 421.61218629,
+      "minorUnits": 2,
+      "symbol": "֏",
+      "countryCode": "am",
+      "isIso4217": true
+    },
+    "ang": {
+      "name": "Dutch Guilder",
+      "rate": 2.0718122,
+      "minorUnits": 2,
+      "symbol": "ƒ",
+      "countryCode": "cw",
+      "isIso4217": true
+    },
+    "aoa": {
+      "name": "Angolan Kwanza",
+      "rate": 1056.02415771,
+      "minorUnits": 2,
+      "symbol": "Kz",
+      "countryCode": "ao",
+      "isIso4217": true
+    },
+    "apt": {
+      "name": "Aptos",
+      "rate": 2.06346532,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "arb": {
+      "name": "Arbitrum",
+      "rate": 14.76738066,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "ars": {
+      "name": "Argentine Peso",
+      "rate": 1713.26475184,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "ar",
+      "isIso4217": true
+    },
+    "atom": {
+      "name": "Cosmos",
+      "rate": 0.93828506,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "aud": {
+      "name": "Australian Dollar",
+      "rate": 1.63943962,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "au",
+      "isIso4217": true
+    },
+    "avax": {
+      "name": "Avalanche",
+      "rate": 0.18030149,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "awg": {
+      "name": "Aruban or Dutch Guilder",
+      "rate": 2.06371525,
+      "minorUnits": 2,
+      "symbol": "ƒ",
+      "countryCode": "aw",
+      "isIso4217": true
+    },
+    "azn": {
+      "name": "Azerbaijan Manat",
+      "rate": 1.95995219,
+      "minorUnits": 2,
+      "symbol": "₼",
+      "countryCode": "az",
+      "isIso4217": true
+    },
+    "bam": {
+      "name": "Bosnian Convertible Mark",
+      "rate": 1.95583,
+      "minorUnits": 2,
+      "symbol": "KM",
+      "countryCode": "ba",
+      "isIso4217": true
+    },
+    "bbd": {
+      "name": "Barbadian or Bajan Dollar",
+      "rate": 2.3058271,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "bb",
+      "isIso4217": true
+    },
+    "bch": {
+      "name": "Bitcoin Cash",
+      "rate": 0.0054534085,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "bdt": {
+      "name": "Bangladeshi Taka",
+      "rate": 142.22473205,
+      "minorUnits": 2,
+      "symbol": "৳",
+      "countryCode": "bd",
+      "isIso4217": true
+    },
+    "bgn": {
+      "name": "Bulgarian Lev",
+      "rate": 1.95583,
+      "minorUnits": 2,
+      "symbol": "лв",
+      "countryCode": "bg",
+      "isIso4217": true
+    },
+    "bhd": {
+      "name": "Bahraini Dinar",
+      "rate": 0.43349549,
+      "minorUnits": 3,
+      "symbol": "د.ب",
+      "countryCode": "bh",
+      "isIso4217": true
+    },
+    "bif": {
+      "name": "Burundian Franc",
+      "rate": 3409.84444569,
+      "minorUnits": 0,
+      "symbol": "FBu",
+      "countryCode": "bi",
+      "isIso4217": true
+    },
+    "bmd": {
+      "name": "Bermudian Dollar",
+      "rate": 1.15291355,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "bm",
+      "isIso4217": true
+    },
+    "bnb": {
+      "name": "Binance Coin",
+      "rate": 0.0019576181,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "bnd": {
+      "name": "Bruneian Dollar",
+      "rate": 1.47812996,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "bn",
+      "isIso4217": true
+    },
+    "bob": {
+      "name": "Bolivian Bolíviano",
+      "rate": 13.85167624,
+      "minorUnits": 2,
+      "symbol": "Bs",
+      "countryCode": "bo",
+      "isIso4217": true
+    },
+    "brl": {
+      "name": "Brazilian Real",
+      "rate": 5.85324517,
+      "minorUnits": 2,
+      "symbol": "R$",
+      "countryCode": "br",
+      "isIso4217": true
+    },
+    "bsd": {
+      "name": "Bahamian Dollar",
+      "rate": 1.15291355,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "bs",
+      "isIso4217": true
+    },
+    "btc": {
+      "name": "Bitcoin",
+      "rate": 0.000018322492,
+      "minorUnits": null,
+      "symbol": "₿",
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "btn": {
+      "name": "Bhutanese Ngultrum",
+      "rate": 110.01096639,
+      "minorUnits": 2,
+      "symbol": "Nu.",
+      "countryCode": "bt",
+      "isIso4217": true
+    },
+    "bwp": {
+      "name": "Botswana Pula",
+      "rate": 15.67237692,
+      "minorUnits": 2,
+      "symbol": "P",
+      "countryCode": "bw",
+      "isIso4217": true
+    },
+    "byn": {
+      "name": "Belarusian Ruble",
+      "rate": 3.345938,
+      "minorUnits": 2,
+      "symbol": "Br",
+      "countryCode": "by",
+      "isIso4217": true
+    },
+    "bzd": {
+      "name": "Belizean Dollar",
+      "rate": 2.32277166,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "bz",
+      "isIso4217": true
+    },
+    "cad": {
+      "name": "Canadian Dollar",
+      "rate": 1.61648426,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "ca",
+      "isIso4217": true
+    },
+    "cdf": {
+      "name": "Congolese Franc",
+      "rate": 2620.31267014,
+      "minorUnits": 2,
+      "symbol": "FC",
+      "countryCode": "cd",
+      "isIso4217": true
+    },
+    "chf": {
+      "name": "Swiss Franc",
+      "rate": 0.93132955,
+      "minorUnits": 2,
+      "symbol": null,
+      "countryCode": "ch",
+      "isIso4217": true
+    },
+    "clp": {
+      "name": "Chilean Peso",
+      "rate": 1073.37247375,
+      "minorUnits": 0,
+      "symbol": "$",
+      "countryCode": "cl",
+      "isIso4217": true
+    },
+    "cny": {
+      "name": "Chinese Yuan Renminbi",
+      "rate": 7.78696321,
+      "minorUnits": 2,
+      "symbol": "¥",
+      "countryCode": "cn",
+      "isIso4217": true
+    },
+    "cop": {
+      "name": "Colombian Peso",
+      "rate": 3645.68248393,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "co",
+      "isIso4217": true
+    },
+    "crc": {
+      "name": "Costa Rican Colon",
+      "rate": 523.20829357,
+      "minorUnits": 2,
+      "symbol": "₡",
+      "countryCode": "cr",
+      "isIso4217": true
+    },
+    "cup": {
+      "name": "Cuban Peso",
+      "rate": 30.572075,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "cu",
+      "isIso4217": true
+    },
+    "cve": {
+      "name": "Cape Verdean Escudo",
+      "rate": 110.27,
+      "minorUnits": 2,
+      "symbol": "Esc",
+      "countryCode": "cv",
+      "isIso4217": true
+    },
+    "czk": {
+      "name": "Czech Koruna",
+      "rate": 24.22590868,
+      "minorUnits": 2,
+      "symbol": "Kč",
+      "countryCode": "cz",
+      "isIso4217": true
+    },
+    "dai": {
+      "name": "DAI",
+      "rate": 1.15415307,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "djf": {
+      "name": "Djiboutian Franc",
+      "rate": 205.60733004,
+      "minorUnits": 0,
+      "symbol": "Fdj",
+      "countryCode": "dj",
+      "isIso4217": true
+    },
+    "dkk": {
+      "name": "Danish Krone",
+      "rate": 7.47451068,
+      "minorUnits": 2,
+      "symbol": "kr",
+      "countryCode": "dk",
+      "isIso4217": true
+    },
+    "doge": {
+      "name": "Dogecoin",
+      "rate": 16.46956935,
+      "minorUnits": null,
+      "symbol": "Ð",
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "dop": {
+      "name": "Dominican Peso",
+      "rate": 67.05727773,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "do",
+      "isIso4217": true
+    },
+    "dot": {
+      "name": "Polkadot",
+      "rate": 1.51072405,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "dzd": {
+      "name": "Algerian Dinar",
+      "rate": 153.23715957,
+      "minorUnits": 2,
+      "symbol": "د.ج",
+      "countryCode": "dz",
+      "isIso4217": true
+    },
+    "egp": {
+      "name": "Egyptian Pound",
+      "rate": 58.97493464,
+      "minorUnits": 2,
+      "symbol": "£",
+      "countryCode": "eg",
+      "isIso4217": true
+    },
+    "ern": {
+      "name": "Eritrean Nakfa",
+      "rate": 17.29370324,
+      "minorUnits": 2,
+      "symbol": "Nfk",
+      "countryCode": "er",
+      "isIso4217": true
+    },
+    "etb": {
+      "name": "Ethiopian Birr",
+      "rate": 183.68172591,
+      "minorUnits": 2,
+      "symbol": "Br",
+      "countryCode": "et",
+      "isIso4217": true
+    },
+    "etc": {
+      "name": "Ethereum Classic",
+      "rate": 0.17249655,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "eth": {
+      "name": "Ethereum",
+      "rate": 0.00061815198,
+      "minorUnits": null,
+      "symbol": "Ξ",
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "eur": {
+      "name": "Euro",
+      "rate": 1,
+      "minorUnits": 2,
+      "symbol": "€",
+      "countryCode": "eu",
+      "isIso4217": true
+    },
+    "fil": {
+      "name": "Filecoin",
+      "rate": 1.6041229,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "fjd": {
+      "name": "Fijian Dollar",
+      "rate": 2.55244789,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "fj",
+      "isIso4217": true
+    },
+    "fkp": {
+      "name": "Falkland Island Pound",
+      "rate": 0.85532744,
+      "minorUnits": 2,
+      "symbol": "£",
+      "countryCode": "fk",
+      "isIso4217": true
+    },
+    "gbp": {
+      "name": "British Pound",
+      "rate": 0.85532744,
+      "minorUnits": 2,
+      "symbol": "£",
+      "countryCode": "gb",
+      "isIso4217": true
+    },
+    "gel": {
+      "name": "Georgian Lari",
+      "rate": 3.01591569,
+      "minorUnits": 2,
+      "symbol": "₾",
+      "countryCode": "ge",
+      "isIso4217": true
+    },
+    "ghs": {
+      "name": "Ghanaian Cedi",
+      "rate": 13.44050539,
+      "minorUnits": 2,
+      "symbol": "₵",
+      "countryCode": "gh",
+      "isIso4217": true
+    },
+    "gip": {
+      "name": "Gibraltar Pound",
+      "rate": 0.85532744,
+      "minorUnits": 2,
+      "symbol": "£",
+      "countryCode": "gi",
+      "isIso4217": true
+    },
+    "gmd": {
+      "name": "Gambian Dalasi",
+      "rate": 85.1231924,
+      "minorUnits": 2,
+      "symbol": "D",
+      "countryCode": "gm",
+      "isIso4217": true
+    },
+    "gnf": {
+      "name": "Guinean Franc",
+      "rate": 10094.20900435,
+      "minorUnits": 0,
+      "symbol": "FG",
+      "countryCode": "gn",
+      "isIso4217": true
+    },
+    "gtq": {
+      "name": "Guatemalan Quetzal",
+      "rate": 8.78813531,
+      "minorUnits": 2,
+      "symbol": "Q",
+      "countryCode": "gt",
+      "isIso4217": true
+    },
+    "gyd": {
+      "name": "Guyanese Dollar",
+      "rate": 240.0273515,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "gy",
+      "isIso4217": true
+    },
+    "hbar": {
+      "name": "Hedera",
+      "rate": 16.46437694,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "hkd": {
+      "name": "Hong Kong Dollar",
+      "rate": 9.0410153,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "hk",
+      "isIso4217": true
+    },
+    "hnl": {
+      "name": "Honduran Lempira",
+      "rate": 30.86374485,
+      "minorUnits": 2,
+      "symbol": "L",
+      "countryCode": "hn",
+      "isIso4217": true
+    },
+    "htg": {
+      "name": "Haitian Gourde",
+      "rate": 150.28779464,
+      "minorUnits": 2,
+      "symbol": "G",
+      "countryCode": "ht",
+      "isIso4217": true
+    },
+    "huf": {
+      "name": "Hungarian Forint",
+      "rate": 364.95919306,
+      "minorUnits": 2,
+      "symbol": "Ft",
+      "countryCode": "hu",
+      "isIso4217": true
+    },
+    "icp": {
+      "name": "Internet Computer",
+      "rate": 0.55747003,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "idr": {
+      "name": "Indonesian Rupiah",
+      "rate": 20780.31591916,
+      "minorUnits": 2,
+      "symbol": "Rp",
+      "countryCode": "id",
+      "isIso4217": true
+    },
+    "ils": {
+      "name": "Israeli Shekel",
+      "rate": 3.52934575,
+      "minorUnits": 2,
+      "symbol": "₪",
+      "countryCode": "il",
+      "isIso4217": true
+    },
+    "inr": {
+      "name": "Indian Rupee",
+      "rate": 110.01096639,
+      "minorUnits": 2,
+      "symbol": "₹",
+      "countryCode": "in",
+      "isIso4217": true
+    },
+    "iqd": {
+      "name": "Iraqi Dinar",
+      "rate": 1506.10400158,
+      "minorUnits": 3,
+      "symbol": "ع.د",
+      "countryCode": "iq",
+      "isIso4217": true
+    },
+    "irr": {
+      "name": "Iranian Rial",
+      "rate": 1586431.11648,
+      "minorUnits": 2,
+      "symbol": "﷼",
+      "countryCode": "ir",
+      "isIso4217": true
+    },
+    "isk": {
+      "name": "Icelandic Krona",
+      "rate": 142.07836708,
+      "minorUnits": 0,
+      "symbol": "kr",
+      "countryCode": "is",
+      "isIso4217": true
+    },
+    "jmd": {
+      "name": "Jamaican Dollar",
+      "rate": 182.46598173,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "jm",
+      "isIso4217": true
+    },
+    "jod": {
+      "name": "Jordanian Dinar",
+      "rate": 0.81741571,
+      "minorUnits": 3,
+      "symbol": "د.ا",
+      "countryCode": "jo",
+      "isIso4217": true
+    },
+    "jpy": {
+      "name": "Japanese Yen",
+      "rate": 181.76155543,
+      "minorUnits": 0,
+      "symbol": "¥",
+      "countryCode": "jp",
+      "isIso4217": true
+    },
+    "kes": {
+      "name": "Kenyan Shilling",
+      "rate": 148.7686342,
+      "minorUnits": 2,
+      "symbol": "KSh",
+      "countryCode": "ke",
+      "isIso4217": true
+    },
+    "kgs": {
+      "name": "Kyrgyzstani Som",
+      "rate": 100.85834627,
+      "minorUnits": 2,
+      "symbol": "с",
+      "countryCode": "kg",
+      "isIso4217": true
+    },
+    "khr": {
+      "name": "Cambodian Riel",
+      "rate": 4651.43797417,
+      "minorUnits": 2,
+      "symbol": "៛",
+      "countryCode": "kh",
+      "isIso4217": true
+    },
+    "kmf": {
+      "name": "Comorian Franc",
+      "rate": 491.96774999,
+      "minorUnits": 0,
+      "symbol": "CF",
+      "countryCode": "km",
+      "isIso4217": true
+    },
+    "kpw": {
+      "name": "KPW",
+      "rate": null,
+      "minorUnits": 2,
+      "symbol": "₩",
+      "countryCode": "kp",
+      "isIso4217": true
+    },
+    "krw": {
+      "name": "South Korean Won",
+      "rate": 1663.69384786,
+      "minorUnits": 0,
+      "symbol": "₩",
+      "countryCode": "kr",
+      "isIso4217": true
+    },
+    "kwd": {
+      "name": "Kuwaiti Dinar",
+      "rate": 0.35655419,
+      "minorUnits": 3,
+      "symbol": "د.ك",
+      "countryCode": "kw",
+      "isIso4217": true
+    },
+    "kyd": {
+      "name": "Caymanian Dollar",
+      "rate": 0.95818563,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "ky",
+      "isIso4217": true
+    },
+    "kzt": {
+      "name": "Kazakhstani Tenge",
+      "rate": 546.34770518,
+      "minorUnits": 2,
+      "symbol": "₸",
+      "countryCode": "kz",
+      "isIso4217": true
+    },
+    "lak": {
+      "name": "Lao Kip",
+      "rate": 26058.26449593,
+      "minorUnits": 2,
+      "symbol": "₭",
+      "countryCode": "la",
+      "isIso4217": true
+    },
+    "lbp": {
+      "name": "Lebanese Pound",
+      "rate": 102767.24292367,
+      "minorUnits": 2,
+      "symbol": "£",
+      "countryCode": "lb",
+      "isIso4217": true
+    },
+    "link": {
+      "name": "Chainlink",
+      "rate": 0.14051572,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "lkr": {
+      "name": "Sri Lankan Rupee",
+      "rate": 385.86198029,
+      "minorUnits": 2,
+      "symbol": "₨",
+      "countryCode": "lk",
+      "isIso4217": true
+    },
+    "lrd": {
+      "name": "Liberian Dollar",
+      "rate": 207.46784153,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "lr",
+      "isIso4217": true
+    },
+    "lsl": {
+      "name": "Basotho Loti",
+      "rate": 19.07453557,
+      "minorUnits": 2,
+      "symbol": "L",
+      "countryCode": "ls",
+      "isIso4217": true
+    },
+    "ltc": {
+      "name": "Litecoin",
+      "rate": 0.025938202,
+      "minorUnits": null,
+      "symbol": "Ł",
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "lyd": {
+      "name": "Libyan Dinar",
+      "rate": 7.35426648,
+      "minorUnits": 3,
+      "symbol": "د.ل",
+      "countryCode": "ly",
+      "isIso4217": true
+    },
+    "mad": {
+      "name": "Moroccan Dirham",
+      "rate": 10.75375194,
+      "minorUnits": 2,
+      "symbol": "د.م",
+      "countryCode": "ma",
+      "isIso4217": true
+    },
+    "mdl": {
+      "name": "Moldovan Leu",
+      "rate": 20.08361301,
+      "minorUnits": 2,
+      "symbol": "L",
+      "countryCode": "md",
+      "isIso4217": true
+    },
+    "mga": {
+      "name": "Malagasy Ariary",
+      "rate": 4918.95329646,
+      "minorUnits": 2,
+      "symbol": "Ar",
+      "countryCode": "mg",
+      "isIso4217": true
+    },
+    "mkd": {
+      "name": "Macedonian Denar",
+      "rate": 61.4842407,
+      "minorUnits": 2,
+      "symbol": "ден",
+      "countryCode": "mk",
+      "isIso4217": true
+    },
+    "mmk": {
+      "name": "Burmese Kyat",
+      "rate": 2421.61030394,
+      "minorUnits": 2,
+      "symbol": "K",
+      "countryCode": "mm",
+      "isIso4217": true
+    },
+    "mnt": {
+      "name": "Mongolian Tughrik",
+      "rate": 4148.30218086,
+      "minorUnits": 2,
+      "symbol": "₮",
+      "countryCode": "mn",
+      "isIso4217": true
+    },
+    "mop": {
+      "name": "Macau Pataca",
+      "rate": 9.31224576,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "mo",
+      "isIso4217": true
+    },
+    "mru": {
+      "name": "Mauritanian Ouguiya",
+      "rate": 46.19480807,
+      "minorUnits": 2,
+      "symbol": "UM",
+      "countryCode": "mr",
+      "isIso4217": true
+    },
+    "mur": {
+      "name": "Mauritian Rupee",
+      "rate": 54.16582654,
+      "minorUnits": 2,
+      "symbol": "₨",
+      "countryCode": "mu",
+      "isIso4217": true
+    },
+    "mvr": {
+      "name": "Maldivian Rufiyaa",
+      "rate": 17.82234342,
+      "minorUnits": 2,
+      "symbol": "Rf",
+      "countryCode": "mv",
+      "isIso4217": true
+    },
+    "mwk": {
+      "name": "Malawian Kwacha",
+      "rate": 1992.37086472,
+      "minorUnits": 2,
+      "symbol": "MK",
+      "countryCode": "mw",
+      "isIso4217": true
+    },
+    "mxn": {
+      "name": "Mexican Peso",
+      "rate": 19.9970609,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "mx",
+      "isIso4217": true
+    },
+    "myr": {
+      "name": "Malaysian Ringgit",
+      "rate": 4.71015122,
+      "minorUnits": 2,
+      "symbol": "RM",
+      "countryCode": "my",
+      "isIso4217": true
+    },
+    "mzn": {
+      "name": "Mozambican Metical",
+      "rate": 73.58002216,
+      "minorUnits": 2,
+      "symbol": "MT",
+      "countryCode": "mz",
+      "isIso4217": true
+    },
+    "nad": {
+      "name": "Namibian Dollar",
+      "rate": 19.07453557,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "na",
+      "isIso4217": true
+    },
+    "near": {
+      "name": "NEAR Protocol",
+      "rate": 0.69284477,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "ngn": {
+      "name": "Nigerian Naira",
+      "rate": 1571.65158377,
+      "minorUnits": 2,
+      "symbol": "₦",
+      "countryCode": "ng",
+      "isIso4217": true
+    },
+    "nio": {
+      "name": "Nicaraguan Cordoba",
+      "rate": 42.30051208,
+      "minorUnits": 2,
+      "symbol": "C$",
+      "countryCode": "ni",
+      "isIso4217": true
+    },
+    "nok": {
+      "name": "Norwegian Krone",
+      "rate": 10.93681965,
+      "minorUnits": 2,
+      "symbol": "kr",
+      "countryCode": "no",
+      "isIso4217": true
+    },
+    "npr": {
+      "name": "Nepalese Rupee",
+      "rate": 176.10005445,
+      "minorUnits": 2,
+      "symbol": "₨",
+      "countryCode": "np",
+      "isIso4217": true
+    },
+    "nzd": {
+      "name": "New Zealand Dollar",
+      "rate": 1.9613106,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "nz",
+      "isIso4217": true
+    },
+    "omr": {
+      "name": "Omani Rial",
+      "rate": 0.44345251,
+      "minorUnits": 3,
+      "symbol": "﷼",
+      "countryCode": "om",
+      "isIso4217": true
+    },
+    "op": {
+      "name": "Optimism",
+      "rate": 13.49831866,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "pab": {
+      "name": "Panamanian Balboa",
+      "rate": 1.15291355,
+      "minorUnits": 2,
+      "symbol": "B",
+      "countryCode": "pa",
+      "isIso4217": true
+    },
+    "pen": {
+      "name": "Peruvian Sol",
+      "rate": 3.90785198,
+      "minorUnits": 2,
+      "symbol": "S/",
+      "countryCode": "pe",
+      "isIso4217": true
+    },
+    "pgk": {
+      "name": "Papua New Guinean Kina",
+      "rate": 5.09330265,
+      "minorUnits": 2,
+      "symbol": "K",
+      "countryCode": "pg",
+      "isIso4217": true
+    },
+    "php": {
+      "name": "Philippine Peso",
+      "rate": 70.60974429,
+      "minorUnits": 2,
+      "symbol": "₱",
+      "countryCode": "ph",
+      "isIso4217": true
+    },
+    "pkr": {
+      "name": "Pakistani Rupee",
+      "rate": 319.23040868,
+      "minorUnits": 2,
+      "symbol": "₨",
+      "countryCode": "pk",
+      "isIso4217": true
+    },
+    "pln": {
+      "name": "Polish Zloty",
+      "rate": 4.30877767,
+      "minorUnits": 2,
+      "symbol": "zł",
+      "countryCode": "pl",
+      "isIso4217": true
+    },
+    "pol": {
+      "name": "Proof Of Liquidity",
+      "rate": 16.05542434,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "pyg": {
+      "name": "Paraguayan Guarani",
+      "rate": 6851.12225683,
+      "minorUnits": 0,
+      "symbol": "₲",
+      "countryCode": "py",
+      "isIso4217": true
+    },
+    "qar": {
+      "name": "Qatari Riyal",
+      "rate": 4.19660532,
+      "minorUnits": 2,
+      "symbol": "﷼",
+      "countryCode": "qa",
+      "isIso4217": true
+    },
+    "ron": {
+      "name": "Romanian Leu",
+      "rate": 5.24448149,
+      "minorUnits": 2,
+      "symbol": "lei",
+      "countryCode": "ro",
+      "isIso4217": true
+    },
+    "rsd": {
+      "name": "Serbian Dinar",
+      "rate": 117.6515063,
+      "minorUnits": 2,
+      "symbol": "дин.",
+      "countryCode": "rs",
+      "isIso4217": true
+    },
+    "rub": {
+      "name": "Russian Ruble",
+      "rate": 91.443047,
+      "minorUnits": 2,
+      "symbol": "₽",
+      "countryCode": "ru",
+      "isIso4217": true
+    },
+    "rwf": {
+      "name": "Rwandan Franc",
+      "rate": 1689.05293078,
+      "minorUnits": 0,
+      "symbol": "F",
+      "countryCode": "rw",
+      "isIso4217": true
+    },
+    "sar": {
+      "name": "Saudi Arabian Riyal",
+      "rate": 4.32342581,
+      "minorUnits": 2,
+      "symbol": "﷼",
+      "countryCode": "sa",
+      "isIso4217": true
+    },
+    "sbd": {
+      "name": "Solomon Islander Dollar",
+      "rate": 9.3163059,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "sb",
+      "isIso4217": true
+    },
+    "scr": {
+      "name": "Seychellois Rupee",
+      "rate": 15.56851159,
+      "minorUnits": 2,
+      "symbol": "₨",
+      "countryCode": "sc",
+      "isIso4217": true
+    },
+    "sdg": {
+      "name": "Sudanese Pound",
+      "rate": 691.97259004,
+      "minorUnits": 2,
+      "symbol": "£",
+      "countryCode": "sd",
+      "isIso4217": true
+    },
+    "sek": {
+      "name": "Swedish Krona",
+      "rate": 10.97813055,
+      "minorUnits": 2,
+      "symbol": "kr",
+      "countryCode": "se",
+      "isIso4217": true
+    },
+    "sgd": {
+      "name": "Singapore Dollar",
+      "rate": 1.47812996,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "sg",
+      "isIso4217": true
+    },
+    "shib": {
+      "name": "Shiba Inu",
+      "rate": 233585.64686023,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "shp": {
+      "name": "Saint Helenian Pound",
+      "rate": 0.85532744,
+      "minorUnits": 2,
+      "symbol": "£",
+      "countryCode": "sh",
+      "isIso4217": true
+    },
+    "sle": {
+      "name": "Sierra Leonean Leone",
+      "rate": 26.40175577,
+      "minorUnits": 2,
+      "symbol": "Le",
+      "countryCode": "sl",
+      "isIso4217": true
+    },
+    "sol": {
+      "name": "Solana",
+      "rate": 0.015826707,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "sos": {
+      "name": "Somali Shilling",
+      "rate": 658.29179848,
+      "minorUnits": 2,
+      "symbol": "Sh",
+      "countryCode": "so",
+      "isIso4217": true
+    },
+    "srd": {
+      "name": "Surinamese Dollar",
+      "rate": 43.55457803,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "sr",
+      "isIso4217": true
+    },
+    "ssp": {
+      "name": "South Sudanese Pound",
+      "rate": 5764.72754952,
+      "minorUnits": 2,
+      "symbol": "£",
+      "countryCode": "ss",
+      "isIso4217": true
+    },
+    "stn": {
+      "name": "Sao Tomean Dobra",
+      "rate": 24.4900653,
+      "minorUnits": 2,
+      "symbol": "Db",
+      "countryCode": "st",
+      "isIso4217": true
+    },
+    "sui": {
+      "name": "Sui",
+      "rate": 1.68520618,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "svc": {
+      "name": "Salvadoran Colon",
+      "rate": 10.08799356,
+      "minorUnits": 2,
+      "symbol": "₡",
+      "countryCode": "sv",
+      "isIso4217": true
+    },
+    "syp": {
+      "name": "SYP",
+      "rate": null,
+      "minorUnits": 2,
+      "symbol": "£",
+      "countryCode": "sy",
+      "isIso4217": true
+    },
+    "szl": {
+      "name": "Swazi Lilangeni",
+      "rate": 19.07453557,
+      "minorUnits": 2,
+      "symbol": "L",
+      "countryCode": "sz",
+      "isIso4217": true
+    },
+    "thb": {
+      "name": "Thai Baht",
+      "rate": 38.55636369,
+      "minorUnits": 2,
+      "symbol": "฿",
+      "countryCode": "th",
+      "isIso4217": true
+    },
+    "tjs": {
+      "name": "Tajikistani Somoni",
+      "rate": 10.62789799,
+      "minorUnits": 2,
+      "symbol": "ЅМ",
+      "countryCode": "tj",
+      "isIso4217": true
+    },
+    "tmt": {
+      "name": "Turkmenistani Manat",
+      "rate": 3.95388563,
+      "minorUnits": 2,
+      "symbol": "m",
+      "countryCode": "tm",
+      "isIso4217": true
+    },
+    "tnd": {
+      "name": "Tunisian Dinar",
+      "rate": 3.39944074,
+      "minorUnits": 3,
+      "symbol": "د.ت",
+      "countryCode": "tn",
+      "isIso4217": true
+    },
+    "top": {
+      "name": "Tongan Pa'anga",
+      "rate": 2.75814778,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "to",
+      "isIso4217": true
+    },
+    "trx": {
+      "name": "TRON",
+      "rate": 3.52919934,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "try": {
+      "name": "Turkish Lira",
+      "rate": 54.8593721,
+      "minorUnits": 2,
+      "symbol": "₺",
+      "countryCode": "tr",
+      "isIso4217": true
+    },
+    "ttd": {
+      "name": "Trinidadian Dollar",
+      "rate": 7.81607344,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "tt",
+      "isIso4217": true
+    },
+    "twd": {
+      "name": "Taiwan New Dollar",
+      "rate": 37.24001075,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "tw",
+      "isIso4217": true
+    },
+    "tzs": {
+      "name": "Tanzanian Shilling",
+      "rate": 3046.80497738,
+      "minorUnits": 2,
+      "symbol": "Sh",
+      "countryCode": "tz",
+      "isIso4217": true
+    },
+    "uah": {
+      "name": "Ukrainian Hryvnia",
+      "rate": 51.33120736,
+      "minorUnits": 2,
+      "symbol": "₴",
+      "countryCode": "ua",
+      "isIso4217": true
+    },
+    "ugx": {
+      "name": "Ugandan Shilling",
+      "rate": 4322.65640186,
+      "minorUnits": 0,
+      "symbol": "USh",
+      "countryCode": "ug",
+      "isIso4217": true
+    },
+    "uni": {
+      "name": "Uniswap",
+      "rate": 0.26832314,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "usd": {
+      "name": "US Dollar",
+      "rate": 1.15291355,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "us",
+      "isIso4217": true
+    },
+    "usdc": {
+      "name": "USDC",
+      "rate": 1.15387257,
+      "minorUnits": null,
+      "symbol": "$",
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "usdt": {
+      "name": "Tether",
+      "rate": 1.15486652,
+      "minorUnits": null,
+      "symbol": "₮",
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "uyu": {
+      "name": "Uruguayan Peso",
+      "rate": 46.24272471,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "uy",
+      "isIso4217": true
+    },
+    "uzs": {
+      "name": "Uzbekistani Som",
+      "rate": 13771.81024011,
+      "minorUnits": 2,
+      "symbol": "soʻm",
+      "countryCode": "uz",
+      "isIso4217": true
+    },
+    "ved": {
+      "name": "VED",
+      "rate": null,
+      "minorUnits": 2,
+      "symbol": "Bs.",
+      "countryCode": "ve",
+      "isIso4217": true
+    },
+    "ves": {
+      "name": "Venezuelan Bolívar",
+      "rate": 860.68961749,
+      "minorUnits": 2,
+      "symbol": "Bs.",
+      "countryCode": "ve",
+      "isIso4217": true
+    },
+    "vet": {
+      "name": "Vechain",
+      "rate": 242.74816828,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "vnd": {
+      "name": "Vietnamese Dong",
+      "rate": 30266.182349,
+      "minorUnits": 0,
+      "symbol": "₫",
+      "countryCode": "vn",
+      "isIso4217": true
+    },
+    "vuv": {
+      "name": "Ni-Vanuatu Vatu",
+      "rate": 136.21696738,
+      "minorUnits": 0,
+      "symbol": "VT",
+      "countryCode": "vu",
+      "isIso4217": true
+    },
+    "wst": {
+      "name": "Samoan Tala",
+      "rate": 3.1526312,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": "ws",
+      "isIso4217": true
+    },
+    "xaf": {
+      "name": "Central African CFA Franc BEAC",
+      "rate": 655.95699999,
+      "minorUnits": 0,
+      "symbol": "F",
+      "countryCode": null,
+      "isIso4217": true
+    },
+    "xag": {
+      "name": "Silver Ounce",
+      "rate": 0.019995089,
+      "minorUnits": null,
+      "symbol": "oz",
+      "countryCode": null,
+      "isIso4217": true
+    },
+    "xau": {
+      "name": "Gold Ounce",
+      "rate": 0.00028518504,
+      "minorUnits": null,
+      "symbol": "oz",
+      "countryCode": null,
+      "isIso4217": true
+    },
+    "xcd": {
+      "name": "East Caribbean Dollar",
+      "rate": 3.11571109,
+      "minorUnits": 2,
+      "symbol": "$",
+      "countryCode": null,
+      "isIso4217": true
+    },
+    "xcg": {
+      "name": "Xchange",
+      "rate": 2.0718122,
+      "minorUnits": 2,
+      "symbol": "Cg.",
+      "countryCode": "cw",
+      "isIso4217": true
+    },
+    "xlm": {
+      "name": "Stellar Lumen",
+      "rate": 6.69503659,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "xmr": {
+      "name": "Monero",
+      "rate": 0.0031631709,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "xof": {
+      "name": "CFA Franc",
+      "rate": 655.95699999,
+      "minorUnits": 0,
+      "symbol": "F",
+      "countryCode": null,
+      "isIso4217": true
+    },
+    "xpd": {
+      "name": "Palladium Ounce",
+      "rate": 0.00090108322,
+      "minorUnits": null,
+      "symbol": "oz",
+      "countryCode": null,
+      "isIso4217": true
+    },
+    "xpf": {
+      "name": "CFP Franc",
+      "rate": 119.33174224,
+      "minorUnits": 0,
+      "symbol": "F",
+      "countryCode": null,
+      "isIso4217": true
+    },
+    "xpt": {
+      "name": "Platinum Ounce",
+      "rate": 0.00069810725,
+      "minorUnits": null,
+      "symbol": "oz",
+      "countryCode": null,
+      "isIso4217": true
+    },
+    "xrp": {
+      "name": "Ripple",
+      "rate": 1.08405594,
+      "minorUnits": null,
+      "symbol": null,
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "xtz": {
+      "name": "Tezos",
+      "rate": 5.69885081,
+      "minorUnits": null,
+      "symbol": "ꜩ",
+      "countryCode": null,
+      "isIso4217": false
+    },
+    "yer": {
+      "name": "Yemeni Rial",
+      "rate": 274.73079694,
+      "minorUnits": 2,
+      "symbol": "﷼",
+      "countryCode": "ye",
+      "isIso4217": true
+    },
+    "zar": {
+      "name": "South African Rand",
+      "rate": 19.07453557,
+      "minorUnits": 2,
+      "symbol": "R",
+      "countryCode": "za",
+      "isIso4217": true
+    },
+    "zmw": {
+      "name": "Zambian Kwacha",
+      "rate": 21.61777401,
+      "minorUnits": 2,
+      "symbol": "ZK",
+      "countryCode": "zm",
+      "isIso4217": true
+    },
+    "zwg": {
+      "name": "ZWG",
+      "rate": null,
+      "minorUnits": 2,
+      "symbol": "ZiG",
+      "countryCode": "zw",
+      "isIso4217": true
+    }
+  }
+}

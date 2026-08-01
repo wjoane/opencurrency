@@ -1,25 +1,15 @@
 services:
   app:
     build: .
-    # Share the host network stack so Expo advertises the machine's real LAN IP.
-    # Without this the dev server would hand your phone an unroutable container
-    # IP (172.x.x.x). Linux-only; no port mappings are needed or possible.
     network_mode: host
     user: 'node'
     working_dir: /workspace
     volumes:
       - .:/workspace
-      # Persist the npm cache across container recreations so reinstalls are
-      # not redownloads.
       - npm-cache:/home/node/.npm
-      # Global Expo state, including EAS login credentials. Without this,
-      # `eas login` would be lost on every `docker-compose run --rm`.
       - expo-state:/home/node/.expo
     environment:
-      # Quieter, more predictable logs in a container.
       EXPO_NO_TELEMETRY: '1'
-    # Required for Expo's interactive terminal UI (r = reload, w = web,
-    # j = debugger, ? = help). Do not run this service with -d.
     stdin_open: true
     tty: true
     command: ['npx', 'expo', 'start']

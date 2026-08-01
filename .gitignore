@@ -1,7 +1,10 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
-
 # IDE
 .idea
+
+# LLM
+graphify-out
+.graphify_detect.json
+.claude
 
 # dependencies
 node_modules/
@@ -47,3 +50,4 @@ yarn-error.*
 
 # per-machine Docker Compose tweaks (see README)
 docker-compose.override.yml
+coverage/
