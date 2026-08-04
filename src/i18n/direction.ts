@@ -25,18 +25,11 @@ function createPlatformEnvironment(): DirectionEnvironment {
 
 const platformDirection: DirectionEnvironment = createPlatformEnvironment();
 
-export function needsDirectionChange(
+function needsDirectionChange(
   direction: LayoutDirection,
   environment: DirectionEnvironment = platformDirection,
 ): boolean {
   return (direction === 'rtl') !== environment.isRTL();
-}
-
-function commitDirection(direction: LayoutDirection, environment: DirectionEnvironment): void {
-  const rtl = direction === 'rtl';
-
-  environment.allowRTL(rtl);
-  environment.forceRTL(rtl);
 }
 
 export function reconcileDirection(
@@ -48,6 +41,10 @@ export function reconcileDirection(
   }
 
   try {
-    commitDirection(direction, environment);
-  } catch {}
+    const rtl = direction === 'rtl';
+    environment.allowRTL(rtl);
+    environment.forceRTL(rtl);
+  } catch {
+    // Direction reconciliation is best-effort; the current platform direction remains usable.
+  }
 }

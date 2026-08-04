@@ -6,19 +6,19 @@
  */
 
 import { getMinorUnits, getSymbol } from './currencyMetadata';
-import { getLocaleSeparators, type LocaleGroupSizes } from './intlCapabilities';
+import {
+  getCurrencySymbolPlacement,
+  getLocaleSeparators,
+  type LocaleGroupSizes,
+} from './intlCapabilities';
 import { decimalExponent, type MoneyAmount, toFixedDecimalString } from './money';
 
 export interface AmountFormatOptions {
   readonly currencyCode: string;
-
   readonly locale: string;
 }
 
 const DECIMAL_POINT = '.';
-const MINUS_SIGN = '-';
-const NON_BREAKING_SPACE = '\u00A0';
-
 const ADAPTIVE_SIGNIFICANT_DIGITS = 8;
 
 const MAX_ADAPTIVE_DECIMAL_PLACES = 12;
@@ -67,16 +67,12 @@ function groupIntegerDigits(
 
 function formatDecimalString(decimalString: string, locale: string): string {
   const separators = getLocaleSeparators(locale);
-
-  const isNegative = decimalString.startsWith(MINUS_SIGN);
-  const [integerDigits, fractionDigits] = (
-    isNegative ? decimalString.slice(MINUS_SIGN.length) : decimalString
-  ).split(DECIMAL_POINT);
+  const [integerDigits, fractionDigits] = decimalString.split(DECIMAL_POINT);
 
   const grouped = groupIntegerDigits(integerDigits, separators.group, separators.groupSizes);
   const fraction = fractionDigits ? `${separators.decimal}${fractionDigits}` : '';
 
-  return `${isNegative ? MINUS_SIGN : ''}${grouped}${fraction}`;
+  return `${grouped}${fraction}`;
 }
 
 export function formatAmount(amount: MoneyAmount, options: AmountFormatOptions): string {
@@ -86,11 +82,14 @@ export function formatAmount(amount: MoneyAmount, options: AmountFormatOptions):
   );
 
   const symbol = getSymbol(options.currencyCode) ?? '';
-  const decoratedSymbol = symbol === '' ? '' : `${symbol}${NON_BREAKING_SPACE}`;
+  if (symbol === '') {
+    return number;
+  }
 
-  return number.startsWith(MINUS_SIGN)
-    ? `${MINUS_SIGN}${decoratedSymbol}${number.slice(MINUS_SIGN.length)}`
-    : `${decoratedSymbol}${number}`;
+  const { position, separator } = getCurrencySymbolPlacement(options.locale);
+  return position === 'before'
+    ? `${symbol}${separator}${number}`
+    : `${number}${separator}${symbol}`;
 }
 
 export function formatRate(rate: MoneyAmount, locale: string): string {

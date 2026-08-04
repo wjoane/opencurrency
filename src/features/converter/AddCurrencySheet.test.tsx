@@ -2,7 +2,6 @@ import { fireEvent, render, screen, within } from '@testing-library/react-native
 
 import { I18nProvider } from '../../i18n/I18nContext';
 import { ThemeProvider } from '../../theme/ThemeContext';
-import { CURRENCY_BADGE_TEST_ID } from '../../ui/CurrencyIcon';
 
 import { AddCurrencySheet, type AddCurrencySheetProps } from './AddCurrencySheet';
 import { buildCurrencyOptions } from './currencyOptions';
@@ -110,9 +109,7 @@ describe('AddCurrencySheet', () => {
 
     const option = screen.getByLabelText(/, BTC$/);
 
-    expect(
-      within(option).getByTestId(CURRENCY_BADGE_TEST_ID, { includeHiddenElements: true }),
-    ).toBeOnTheScreen();
+    expect(within(option).getByText('₿', { includeHiddenElements: true })).toBeOnTheScreen();
   });
 
   it('names no currencies until the sheet is first opened', async () => {

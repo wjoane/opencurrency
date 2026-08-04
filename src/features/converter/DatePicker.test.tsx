@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import {
   dismissPicker,
@@ -61,8 +61,7 @@ describe('DatePicker', () => {
     const onDismiss = jest.fn();
 
     await renderPicker({ onDismiss });
-    const picker = platformPickerProps(BASE_PROPS.accessibilityLabel);
-    picker.onNeutralButtonPress?.();
+    await fireEvent(screen.getByLabelText(BASE_PROPS.accessibilityLabel), 'neutralButtonPress');
 
     expect(onDismiss).toHaveBeenCalled();
   });

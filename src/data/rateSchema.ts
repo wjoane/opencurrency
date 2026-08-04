@@ -5,11 +5,11 @@
  */
 
 import { REFERENCE_CURRENCY_CODE, type RateTable } from '../domain/conversion';
+import { isPlainObject } from '../domain/json';
 
 export interface RateSnapshot {
   /** The date reported by the provider. */
   readonly date: string;
-
   /** The currency used as the rate-table base. */
   readonly baseCurrencyCode: string;
   readonly rates: RateTable;
@@ -40,14 +40,6 @@ export function isRateDate(value: string): boolean {
   );
 }
 
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-function readOwnProperty(source: Record<string, unknown>, key: string): unknown {
-  return Object.prototype.hasOwnProperty.call(source, key) ? source[key] : undefined;
-}
-
 function collectRates(source: Record<string, unknown>): RateTable {
   const rates: Record<string, number> = Object.create(null);
 
@@ -60,29 +52,21 @@ function collectRates(source: Record<string, unknown>): RateTable {
   return rates;
 }
 
-export function parseRateSnapshot(
-  body: string,
+export function parseRateDocument(
+  document: unknown,
   baseCurrencyCode: string = REFERENCE_CURRENCY_CODE,
 ): RateSnapshotParseResult {
-  let document: unknown;
-
-  try {
-    document = JSON.parse(body);
-  } catch {
-    return { ok: false, reason: 'notJson' };
-  }
-
   if (!isPlainObject(document)) {
     return { ok: false, reason: 'malformed' };
   }
 
-  const date = readOwnProperty(document, 'date');
+  const { date } = document;
 
   if (typeof date !== 'string' || !isRateDate(date)) {
     return { ok: false, reason: 'malformed' };
   }
 
-  const rateMap = readOwnProperty(document, baseCurrencyCode);
+  const rateMap = document[baseCurrencyCode];
 
   if (!isPlainObject(rateMap)) {
     return { ok: false, reason: 'malformed' };
@@ -95,6 +79,17 @@ export function parseRateSnapshot(
   }
 
   return { ok: true, snapshot: { date, baseCurrencyCode, rates } };
+}
+
+export function parseRateSnapshot(
+  body: string,
+  baseCurrencyCode: string = REFERENCE_CURRENCY_CODE,
+): RateSnapshotParseResult {
+  try {
+    return parseRateDocument(JSON.parse(body), baseCurrencyCode);
+  } catch {
+    return { ok: false, reason: 'notJson' };
+  }
 }
 
 export function parseStoredSnapshot(raw: string): RateSnapshot | null {
@@ -110,9 +105,7 @@ export function parseStoredSnapshot(raw: string): RateSnapshot | null {
     return null;
   }
 
-  const date = readOwnProperty(document, 'date');
-  const baseCurrencyCode = readOwnProperty(document, 'baseCurrencyCode');
-  const rateMap = readOwnProperty(document, 'rates');
+  const { date, baseCurrencyCode, rates: rateMap } = document;
 
   if (typeof date !== 'string' || !isRateDate(date)) {
     return null;

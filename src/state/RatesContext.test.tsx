@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 
 import { type RateRepository, type SnapshotOutcome } from '../data/rateRepository';
@@ -50,6 +50,20 @@ async function renderProbe(repository: RateRepository) {
 }
 
 describe('RatesProvider', () => {
+  it('ignores a request that resolves after unmount', async () => {
+    let resolveLatest!: (outcome: SnapshotOutcome) => void;
+    const repository: RateRepository = {
+      loadLatest: () => new Promise((resolve) => (resolveLatest = resolve)),
+      loadDate: () => new Promise(() => {}),
+    };
+
+    await renderProbe(repository);
+    await screen.unmount();
+    await act(async () => resolveLatest({ status: 'ok', snapshot: snapshot(TODAY) }));
+
+    expect(screen.queryByText('status:ready')).toBeNull();
+  });
+
   it('asks for the latest snapshot on mount and reports it ready', async () => {
     const repository = stubRepository({ status: 'ok', snapshot: snapshot(TODAY) });
 

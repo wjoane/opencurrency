@@ -10,7 +10,6 @@ const STROKE_WIDTH = 1.8;
 
 export interface IconProps {
   readonly color: string;
-
   readonly size: number;
 }
 

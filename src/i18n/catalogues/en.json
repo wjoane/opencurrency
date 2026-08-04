@@ -29,8 +29,8 @@
   "date.change": "Change date",
   "date.label": "Rate date",
   "date.today": "Today",
-  "rates.midMarket": "Mid-market rates",
-  "rates.info.title": "About these rates",
+  "rates.midMarket": "Mid-market rates",
+  "rates.info.title": "About these rates",
   "rates.info.basis": "Amounts are converted at the daily mid-market reference rate, the midpoint between the buying and the selling price, before any fee or margin.",
   "rates.info.source": "Rates come from the free currency-api by @fawazahmed0.\nNo account and no API key.",
   "rates.info.disclaimer": "Rates are provided for information only and may differ from the rates offered by banks, card issuers or exchange services.",
@@ -48,6 +48,6 @@
   "settings.about.description": "OpenCurrency is a lightweight open-source currency converter using openly available daily reference rates.\nNo account, no ads, no tracking.",
   "settings.about.credits": "Flag icons are provided by Copyright (c) 2026 HatScripts, under MIT License.\nRates are provided for free from the open currency-api by @fawazahmed0.",
   "settings.about.licence": "Released under the GNU General Public License v3.",
-  "settings.about.github": "You can contribute to the project on GitHub:\nhttps://github.com/wjoane/opencurrency",
-  "settings.about.buymeacoffee": "You can buy me a coffee if you like this app:\nhttps://buymeacoffee.com/wjoane"
+  "settings.about.github": "You can contribute to the project on GitHub:",
+  "settings.about.buymeacoffee": "You can buy me a coffee if you like this app:"
 }

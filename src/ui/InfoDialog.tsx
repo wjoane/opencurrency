@@ -1,21 +1,18 @@
 /** Renders a sheet containing a title, message, and acknowledgement action. */
 
-import { type ReactNode, useMemo } from 'react';
+import { type ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { type ThemeTokens } from '../theme/tokens';
-import { useTheme } from '../theme/ThemeContext';
+import { useThemedStyles } from '../theme/useThemedStyles';
 
 import { Sheet } from './Sheet';
 
 export interface InfoDialogProps {
   readonly visible: boolean;
   readonly onClose: () => void;
-
   readonly title: string;
-
   readonly closeLabel: string;
-
   readonly confirmLabel: string;
   readonly children: ReactNode;
 }
@@ -28,8 +25,7 @@ export function InfoDialog({
   confirmLabel,
   children,
 }: InfoDialogProps) {
-  const { theme } = useTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
 
   return (
     <Sheet visible={visible} onClose={onClose} title={title} closeLabel={closeLabel}>

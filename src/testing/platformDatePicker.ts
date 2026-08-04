@@ -1,6 +1,4 @@
-import { act, screen } from '@testing-library/react-native';
-
-import { nearestCompositeProps } from './compositeProps';
+import { fireEvent, screen } from '@testing-library/react-native';
 
 export interface PlatformPickerProps {
   readonly value?: unknown;
@@ -13,25 +11,13 @@ export interface PlatformPickerProps {
 }
 
 export function platformPickerProps(accessibilityLabel: string): PlatformPickerProps {
-  return nearestCompositeProps<PlatformPickerProps>(
-    screen.getByLabelText(accessibilityLabel),
-    (props) => props.value instanceof Date,
-    'platform date picker',
-  );
+  return screen.getByLabelText(accessibilityLabel).props as PlatformPickerProps;
 }
 
 export async function selectPickerDate(accessibilityLabel: string, selected: Date) {
-  const { onValueChange } = platformPickerProps(accessibilityLabel);
-
-  await act(async () => {
-    onValueChange?.({}, selected);
-  });
+  await fireEvent(screen.getByLabelText(accessibilityLabel), 'valueChange', {}, selected);
 }
 
 export async function dismissPicker(accessibilityLabel: string) {
-  const { onDismiss } = platformPickerProps(accessibilityLabel);
-
-  await act(async () => {
-    onDismiss?.();
-  });
+  await fireEvent(screen.getByLabelText(accessibilityLabel), 'dismiss');
 }

@@ -1,3 +1,5 @@
+/** Parses editable amount text into a precise monetary value. */
+
 import { fromDecimalString, type MoneyAmount } from './money';
 
 const AMOUNT_PATTERN = /^(\d*)(?:[.,](\d*))?$/;
@@ -17,4 +19,3 @@ export function parseAmount(input: string): MoneyAmount | null {
 
   return fromDecimalString(`${integerDigits || '0'}.${fractionDigits || '0'}`);
 }
-/** Parses editable amount text into a precise monetary value. */

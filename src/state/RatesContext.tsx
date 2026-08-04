@@ -20,13 +20,11 @@ import { type RateFetchFailure } from '../data/ratesApi';
 import { type RateSnapshot } from '../data/rateSchema';
 import { BUNDLED_RATE_SNAPSHOT } from '../data/seededRates';
 
-type RatesStatus = 'loading' | 'ready' | 'stale' | 'error';
+export type RatesStatus = 'loading' | 'ready' | 'stale' | 'error';
 
 interface RatesState {
   readonly status: RatesStatus;
-
-  readonly snapshot: RateSnapshot | null;
-
+  readonly snapshot: RateSnapshot;
   readonly failure: RateFetchFailure | null;
 }
 
@@ -57,7 +55,6 @@ function reduce(state: RatesState, action: RatesAction): RatesState {
 export interface RatesContextValue extends RatesState {
   readonly selectedDate: string | null;
   readonly selectDate: (date: string | null) => void;
-
   readonly reload: () => void;
 }
 
@@ -65,7 +62,6 @@ const RatesContext = createContext<RatesContextValue | null>(null);
 
 export interface RatesProviderProps {
   readonly children: ReactNode;
-
   readonly repository?: RateRepository;
 }
 

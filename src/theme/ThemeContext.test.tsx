@@ -1,10 +1,10 @@
 import { act, render, screen } from '@testing-library/react-native';
 import { type ColorSchemeName, Text } from 'react-native';
 
-import { resolveColorScheme, type ThemePreference, ThemeProvider, useTheme } from './ThemeContext';
+import { type ThemePreference, ThemeProvider, useTheme } from './ThemeContext';
 import { darkTheme, lightTheme } from './tokens';
 
-const mockedUseColorScheme = jest.fn<ColorSchemeName, []>();
+const mockedUseColorScheme = jest.fn<ColorSchemeName | null, []>();
 
 jest.mock('react-native/Libraries/Utilities/useColorScheme', () => ({
   __esModule: true,
@@ -36,25 +36,15 @@ beforeEach(() => {
   mockedUseColorScheme.mockReturnValue('light');
 });
 
-describe('resolveColorScheme', () => {
-  it('follows the device when the preference is system', () => {
-    expect(resolveColorScheme('system', 'light')).toBe('light');
-    expect(resolveColorScheme('system', 'dark')).toBe('dark');
-  });
-
-  it('falls back to light when the device reports nothing usable', () => {
-    expect(resolveColorScheme('system', null)).toBe('light');
-    expect(resolveColorScheme('system', undefined)).toBe('light');
-    expect(resolveColorScheme('system', 'unspecified')).toBe('light');
-  });
-
-  it('ignores the device when the preference is explicit', () => {
-    expect(resolveColorScheme('light', 'dark')).toBe('light');
-    expect(resolveColorScheme('dark', 'light')).toBe('dark');
-  });
-});
-
 describe('ThemeProvider', () => {
+  it('falls back to light when the device reports no color scheme', async () => {
+    mockedUseColorScheme.mockReturnValue(null);
+
+    await renderWithPreference();
+
+    expect(screen.getByText('scheme: light')).toBeOnTheScreen();
+  });
+
   it('defaults to following the device', async () => {
     mockedUseColorScheme.mockReturnValue('dark');
 

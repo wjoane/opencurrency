@@ -1,6 +1,7 @@
 /** Converts amounts through the reference currency. */
 
 import { fromNumber, type MoneyAmount } from './money';
+import { normaliseCurrencyCode } from './currencyCode';
 
 export interface RateTable {
   readonly [currencyCode: string]: number;
@@ -8,10 +9,6 @@ export interface RateTable {
 
 /** The currency used as the rate-table reference. */
 export const REFERENCE_CURRENCY_CODE = 'eur';
-
-function normaliseCode(currencyCode: string): string {
-  return currencyCode.trim().toLowerCase();
-}
 
 function findRate(rates: RateTable, currencyCode: string): MoneyAmount | null {
   const rate = rates[currencyCode];
@@ -31,8 +28,8 @@ export function convertAmount(
   toCurrencyCode: string,
   rates: RateTable,
 ): MoneyAmount | null {
-  const from = normaliseCode(fromCurrencyCode);
-  const to = normaliseCode(toCurrencyCode);
+  const from = normaliseCurrencyCode(fromCurrencyCode);
+  const to = normaliseCurrencyCode(toCurrencyCode);
 
   if (from === to) {
     return amount;

@@ -2,7 +2,7 @@ import {
   fromDecimalString,
   fromNumber,
   type MoneyAmount,
-  toDecimalString,
+  one,
   toFixedDecimalString,
 } from './money';
 
@@ -25,14 +25,20 @@ function expectAmount(amount: MoneyAmount | null): MoneyAmount {
   return amount;
 }
 
+describe('one', () => {
+  it('returns an exact unit amount', () => {
+    expect(one().toFixed()).toBe('1');
+  });
+});
+
 describe('fromNumber', () => {
   it.each(PROVIDER_RATES)('preserves every digit of %p', (rate, expected) => {
     expect(String(rate)).toBe(expected);
-    expect(toDecimalString(expectAmount(fromNumber(rate)))).toBe(expected);
+    expect(expectAmount(fromNumber(rate)).toFixed()).toBe(expected);
   });
 
   it.each(PROVIDER_RATES)('round-trips %p back to the same double', (rate) => {
-    expect(Number(toDecimalString(expectAmount(fromNumber(rate))))).toBe(rate);
+    expect(Number(expectAmount(fromNumber(rate)).toFixed())).toBe(rate);
   });
 
   it('returns null for values that are not finite', () => {
@@ -44,12 +50,12 @@ describe('fromNumber', () => {
 
 describe('fromDecimalString', () => {
   it('accepts a plain decimal string', () => {
-    expect(toDecimalString(expectAmount(fromDecimalString('0.10')))).toBe('0.1');
+    expect(expectAmount(fromDecimalString('0.10')).toFixed()).toBe('0.1');
   });
 
   it('accepts exponential notation and renders it plainly', () => {
-    expect(toDecimalString(expectAmount(fromDecimalString('1.15e-8')))).toBe('0.0000000115');
-    expect(toDecimalString(expectAmount(fromDecimalString('1.5e7')))).toBe('15000000');
+    expect(expectAmount(fromDecimalString('1.15e-8')).toFixed()).toBe('0.0000000115');
+    expect(expectAmount(fromDecimalString('1.5e7')).toFixed()).toBe('15000000');
   });
 
   it('returns null instead of throwing on invalid input', () => {

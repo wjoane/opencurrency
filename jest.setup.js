@@ -7,6 +7,16 @@ jest.mock('@react-native-async-storage/async-storage', () =>
   jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
+jest.mock('@react-native-community/datetimepicker', () => {
+  const React = require('react');
+  const { View } = jest.requireActual('react-native');
+
+  return {
+    __esModule: true,
+    default: (props) => React.createElement(View, props),
+  };
+});
+
 require('react-native-gesture-handler/jestSetup');
 
 jest.mock('react-native-reorderable-list', () => {

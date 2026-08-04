@@ -43,11 +43,11 @@
   "settings.language": "言語",
   "settings.language.system": "デバイスに合わせる",
   "settings.about": "このアプリについて",
-  "settings.about.open": "OpenCurrency について",
+  "settings.about.open": "OpenCurrency について",
   "settings.about.tagline": "シンプルなコンバーター、それだけです。",
   "settings.about.description": "OpenCurrency は、公開されている日次の参照レートを使う軽量なオープンソースの通貨換算アプリです。\nアカウント不要、広告なし、追跡なし。",
   "settings.about.credits": "旗アイコンは Copyright (c) 2026 HatScripts が MIT ライセンスのもとで提供しています。\nレートは @fawazahmed0 のオープンな currency-api から無料で提供されています。",
   "settings.about.licence": "GNU General Public License v3 のもとで公開しています。",
-  "settings.about.github": "GitHub でプロジェクトに貢献できます:\nhttps://github.com/wjoane/opencurrency",
-  "settings.about.buymeacoffee": "このアプリを気に入ったら、コーヒーをおごっていただけます:\nhttps://buymeacoffee.com/wjoane"
+  "settings.about.github": "GitHub でプロジェクトに貢献できます:",
+  "settings.about.buymeacoffee": "このアプリを気に入ったら、コーヒーをおごっていただけます:"
 }

@@ -1,6 +1,6 @@
 /** Renders appearance, language, and application information settings. */
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { SUPPORTED_LOCALES, type Translate, type TranslationKey } from '../../i18n';
@@ -10,6 +10,7 @@ import { getEndonym, getLayoutDirection } from '../../i18n/locales';
 import { useTheme } from '../../theme/ThemeContext';
 import { type ThemePreference } from '../../theme/ThemeContext';
 import { type ThemeTokens } from '../../theme/tokens';
+import { useThemedStyles } from '../../theme/useThemedStyles';
 import { CheckIcon, ChevronDownIcon } from '../../ui/icons';
 import { InfoDialog } from '../../ui/InfoDialog';
 import { Sheet } from '../../ui/Sheet';
@@ -23,6 +24,8 @@ const LANGUAGE_CHOICES: readonly (string | null)[] = [null, ...SUPPORTED_LOCALES
 
 const CHECK_ICON_SIZE = 20;
 const CHEVRON_ICON_SIZE = 18;
+const GITHUB_URL = 'https://github.com/wjoane/opencurrency';
+const BUY_ME_A_COFFEE_URL = 'https://buymeacoffee.com/wjoane';
 
 const APPEARANCE_CHOICES: readonly {
   readonly preference: ThemePreference;
@@ -36,7 +39,7 @@ const APPEARANCE_CHOICES: readonly {
 export function SettingsSheet({ visible, onClose }: SettingsSheetProps) {
   const { theme, preference, setPreference } = useTheme();
   const { locale, followsDevice, t, setLocale } = useI18n();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
   const [languageExpanded, setLanguageExpanded] = useState(false);
   const [aboutVisible, setAboutVisible] = useState(false);
 
@@ -61,12 +64,7 @@ export function SettingsSheet({ visible, onClose }: SettingsSheetProps) {
         <Text style={styles.sectionTitle} accessibilityRole="header">
           {t('settings.appearance')}
         </Text>
-        <AppearanceSelector
-          preference={preference}
-          onChange={setPreference}
-          t={t}
-          styles={styles}
-        />
+        <AppearanceSelector preference={preference} onChange={setPreference} t={t} />
 
         <Text style={styles.sectionTitle} accessibilityRole="header">
           {t('settings.language')}
@@ -94,10 +92,9 @@ export function SettingsSheet({ visible, onClose }: SettingsSheetProps) {
                 label={tag === null ? t('settings.language.system') : getEndonym(tag)}
                 selected={tag === null ? followsDevice : !followsDevice && tag === locale}
                 onPress={() => {
-                  void chooseLocale(tag);
+                  chooseLocale(tag);
                 }}
                 tickColor={theme.colors.primary}
-                styles={styles}
               />
             ))}
           </View>
@@ -126,8 +123,8 @@ export function SettingsSheet({ visible, onClose }: SettingsSheetProps) {
         <Text style={styles.aboutBody}>{t('settings.about.description')}</Text>
         <Text style={styles.aboutBody}>{t('settings.about.licence')}</Text>
         <Text style={styles.aboutBody}>{t('settings.about.credits')}</Text>
-        <ExternalLink label={t('settings.about.github')} styles={styles} />
-        <ExternalLink label={t('settings.about.buymeacoffee')} styles={styles} />
+        <ExternalLink label={t('settings.about.github')} url={GITHUB_URL} />
+        <ExternalLink label={t('settings.about.buymeacoffee')} url={BUY_ME_A_COFFEE_URL} />
       </InfoDialog>
     </Sheet>
   );
@@ -137,10 +134,11 @@ interface AppearanceSelectorProps {
   readonly preference: ThemePreference;
   readonly onChange: (preference: ThemePreference) => void;
   readonly t: Translate;
-  readonly styles: ReturnType<typeof createStyles>;
 }
 
-function AppearanceSelector({ preference, onChange, t, styles }: AppearanceSelectorProps) {
+function AppearanceSelector({ preference, onChange, t }: AppearanceSelectorProps) {
+  const styles = useThemedStyles(createStyles);
+
   return (
     <View
       style={styles.appearanceSelector}
@@ -178,13 +176,13 @@ function AppearanceSelector({ preference, onChange, t, styles }: AppearanceSelec
 interface ChoiceProps {
   readonly label: string;
   readonly selected: boolean;
-
   readonly onPress: () => void;
   readonly tickColor: string;
-  readonly styles: ReturnType<typeof createStyles>;
 }
 
-function Choice({ label, selected, onPress, tickColor, styles }: ChoiceProps) {
+function Choice({ label, selected, onPress, tickColor }: ChoiceProps) {
+  const styles = useThemedStyles(createStyles);
+
   return (
     <Pressable
       onPress={onPress}
@@ -201,34 +199,26 @@ function Choice({ label, selected, onPress, tickColor, styles }: ChoiceProps) {
 
 interface ExternalLinkProps {
   readonly label: string;
-  readonly styles: ReturnType<typeof createStyles>;
+  readonly url: string;
 }
 
-function ExternalLink({ label, styles }: ExternalLinkProps) {
-  const match = label.match(/https:\/\/\S+/);
-  const url = match?.[0];
-
-  if (!url || match?.index === undefined) {
-    return <Text style={styles.aboutBody}>{label}</Text>;
-  }
-
-  const labelPrefix = label.slice(0, match.index);
-  const labelSuffix = label.slice(match.index + url.length);
+function ExternalLink({ label, url }: ExternalLinkProps) {
+  const styles = useThemedStyles(createStyles);
 
   return (
     <Text style={styles.aboutBody}>
-      {labelPrefix}
+      {label}
+      {'\n'}
       <Text
         accessibilityRole="link"
         accessibilityLabel={url}
         onPress={() => {
-          void Linking.openURL(url).catch(() => {});
+          Linking.openURL(url).catch(() => undefined);
         }}
         style={styles.aboutLink}
       >
         {url}
       </Text>
-      {labelSuffix}
     </Text>
   );
 }

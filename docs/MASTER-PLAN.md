@@ -32,7 +32,7 @@ modals for settings, currency selection, rate information, and historical dates.
 currently provides:
 
 - EUR-based exchange-rate loading over HTTPS with provider fallback, response
-  validation, permanent per-date caching, LRU eviction, stale/offline handling, and a
+  validation, permanent per-date caching, bounded write-recency eviction, stale/offline handling, and a
   dated bundled snapshot for first-launch use.
 - Exact decimal conversion and display formatting using `big.js`, ISO-4217 minor
   units, locale separators, shipped symbols/metadata, and safe fallbacks for crypto
@@ -55,6 +55,7 @@ remain operational follow-ups rather than missing application features.
 | --- | --- |
 | `MASTER-PLAN.md` (this file) | Architecture decisions, system structure, implementation summary, and milestone index. The stable "what and why". |
 | `M<NN>-<name>.md` | Optional per-milestone detail: the step-by-step implementation plan, live progress tracking, and a record of what was implemented vs. deferred. |
+| `CODE-REVIEW-<YYYY-MM-DD>[-round-<N>].md` | A point-in-time review of the implementation: findings with stable IDs, severities, and a live status column. Dated because line references go stale; the findings themselves are tracked to closure. A `-round-<N>` suffix marks a review of a previous review's remediation — it verifies the closures and reviews the fixes as new code. |
 
 Conventions:
 
@@ -141,7 +142,7 @@ Free, no API key, no rate limits, no attribution requirement.
 | 14 | Parse-boundary integrity | `JSON.parse` yields a double, but JS `Number→String` is **shortest-round-trip**, so `String(13.49480249) === "13.49480249"` | The provider's decimal digits therefore survive intact into `big.js`, and no custom JSON parser is needed. Pinned by a unit test rather than left as folklore. |
 | 15 | Display precision | **ISO-4217 minor units** — JPY/KRW 0, KWD/BHD/OMR 3, most others 2. Codes with no ISO-4217 definition use adaptive significant digits with trailing zeros trimmed | A flat two decimals renders BTC and gold as `0.00`, i.e. an unusable row. Minor units also match how each country actually writes its money. |
 | 16 | Currency metadata | **Shipped tables**: minor units, symbols, and currency→ISO-3166 country | The provider supplies none of it — `currencies.json` is code→name and nothing else. |
-| 17 | Formatting | Grouping is applied to the **decimal string**, never via `Number`. `Intl` is used *only* to read the locale's group and decimal separators | Converting a `big.js` value to `Number` to format it discards the precision the type exists to protect. Separately, `Intl.NumberFormat(…, {currency:'1INCH'})` throws `RangeError` — a currency code must be exactly three ASCII letters, and the provider returns codes that are not. `style:'currency'` is therefore unusable for this dataset. |
+| 17 | Formatting | Grouping is applied to the **decimal string**, never via `Number`. `Intl` is used to read the locale's group and decimal separators and its currency-symbol placement; shipped fallbacks cover all supported locales | Converting a `big.js` value to `Number` to format it discards the precision the type exists to protect. `Intl.NumberFormat` is probed with a valid ISO currency solely for its locale layout; the shipped symbol is then placed around the exact decimal string. Provider codes such as `1INCH` are never passed to `Intl`, avoiding its three-letter currency-code restriction. |
 | 18 | Digits | **Latin digits in all locales** | CLDR's default numbering system for `ar` is Arabic-Indic (`١٢٣`). Since amounts are rendered from our own decimal string, Latin digits are what we emit unless we deliberately transliterate. Matches the convention of most Arabic-locale finance apps. |
 | 19 | Symbols | Shipped code→symbol map, falling back to the **uppercase code** | Never wrong, and the row already carries a short-identifier column, so the fallback is not a visible failure. |
 
@@ -151,7 +152,7 @@ Free, no API key, no rate limits, no attribution requirement.
 | --- | --- | --- | --- |
 | 20 | Data layer | **Hand-rolled `RateRepository`** over `@react-native-async-storage/async-storage` | Cache-first with in-flight dedup is a small amount of code, and it maps directly onto decision #9. TanStack Query was considered and rejected: its stale-while-revalidate and focus-refetch machinery is dead weight for immutable daily data. |
 | 21 | Storage engine | AsyncStorage | Effectively forced — MMKV requires custom native code, which would break the Expo Go device-testing setup from M01. Backed by `localStorage` on web. |
-| 22 | Storage layout | **One key per date** (`rates:v1:YYYY-MM-DD`) plus an index key. LRU cap of **180 snapshots** (~1 MB), newest always pinned | A single blob would be rewritten in full on every fetch, and would eventually exceed the web `localStorage` quota. |
+| 22 | Storage layout | **One key per date** (`rates:v1:YYYY-MM-DD`) plus an index key. Write-recency cap of **180 snapshots** (~1 MB), newest always pinned; cache reads do not rewrite the index | A single blob would be rewritten in full on every fetch, and would eventually exceed the web `localStorage` quota. Avoiding index writes on reads also prevents historical browsing from causing persistent-storage churn. |
 | 23 | State management | **React Context + `useReducer`**; domain logic in plain TS with no React imports | Two providers (preferences, rates). The load-bearing case is amount editing, which re-renders ~10 memoised rows per keystroke — not a real cost at this scale. Keeps the conversion rules unit-testable without rendering, as `AGENTS.md` requires. |
 | 24 | Persisted across launches | Theme, language, currency list and order, last amount and active currency. **Not** the selected date | A past date silently surviving a cold start would show old rates without the user having asked for them. |
 | 25 | Offline / stale | The newest cached snapshot stays on screen with an explicit stale indicator | Conversion must work offline. Staleness is surfaced, never hidden. |
@@ -168,7 +169,7 @@ Free, no API key, no rate limits, no attribution requirement.
 | 31 | Rate sub-line | The rate **against the active input currency** — `1 USD = 152.31 JPY`. The active row shows its EUR reference rate instead | It is the rate that produced the number directly above it, which is what "the used exchange rate" means. Always showing the EUR rate would display a rate that was not used whenever the input is not EUR. |
 | 32 | Amount input | **Raw text while active** — no live grouping — formatted when inactive. Both `.` and `,` accepted as the decimal separator; the first one typed wins | Live reformatting rewrites the string on every keystroke, and React Native offers no reliable cross-platform cursor control, which is a known source of jumping-cursor bugs. Accepting both separators matters because a German keyboard offers `,` while an iOS numeric keypad may offer `.`. |
 | 33 | Reordering | **`react-native-reorderable-list`** (Reanimated 4) | `react-native-draggable-flatlist` is the better-known library but was last published 2025-05-06 and predates Reanimated 4, which SDK 57 ships. Chosen over hand-rolling because it also supplies auto-scroll. |
-| 34 | Date picker | `@react-native-community/datetimepicker` + a `.web.tsx` sibling rendering `<input type="date">` | Native feel on both shipping platforms. The package has no web implementation, and Metro's platform-extension resolution keeps the fallback out of the native bundle. |
+| 34 | Date picker | `@react-native-community/datetimepicker` + a `.web.tsx` sibling rendering `<input type="date">` | Native feel on both shipping platforms. The package has no web implementation, and Metro's platform-extension resolution keeps the fallback out of the native bundle. When the latest snapshot is stale, opening the picker starts at the current date and keeps an explicit “Today” action available, so the user can distinguish the requested date from the date the provider actually returned. |
 
 ### 4.7 Localisation
 
@@ -176,7 +177,7 @@ Free, no API key, no rate limits, no attribution requirement.
 | --- | --- | --- | --- |
 | 35 | Scope | **Full UI translation, 27 locales**, defaulting to the system locale | User's explicit call, chosen over a formatting-only setting. |
 | 36 | i18n mechanism | Hand-rolled typed `t()` over JSON catalogues | The string set is small. A library adds a dependency and a dependence on `Intl.PluralRules`, whose Hermes support is exactly what decision #38 flags as uncertain. |
-| 37 | RTL (`ar`, `he`, `fa`) | **Live full mirroring without a restart**. The root application view follows the selected locale's `direction`; feature layouts use logical `start`/`end` props and locale-derived gesture direction. `I18nManager` is reconciled for native defaults and future launches, but no reload is requested | `I18nManager` cannot flip the native default direction live, so it is not the rendered tree's source of truth. Keeping direction in locale-driven React state lets the mounted application mirror immediately in both directions without interrupting the user. |
+| 37 | RTL (`ar`, `he`, `fa`) | **Live full mirroring without a restart**. The root application view follows the selected locale's `direction`; feature layouts use logical `start`/`end` props and locale-derived gesture direction. `I18nManager` is reconciled for native defaults and future launches, but no reload is requested. The direction reaches the view through a different channel per platform — the `direction` layout style on native, the DOM `dir` attribute on web — both supplied by `src/ui/layoutDirection.ts` | `I18nManager` cannot flip the native default direction live, so it is not the rendered tree's source of truth. Keeping direction in locale-driven React state lets the mounted application mirror immediately in both directions without interrupting the user. The per-platform split is forced: react-native-web rejects the `direction` style outright, and React Native has no `dir` prop, so a view that mirrors on only one channel silently stops mirroring on the other platform. |
 | 38 | Currency names | `Intl.DisplayNames`, guarded, falling back to the provider's English name | Localised names for every ISO code in all 27 locales with no shipped strings. Hermes's `Intl` implementation is partial, and `DisplayNames` throws for non-three-letter codes such as `1inch` — hence the guard, and hence the spike that opens M03. |
 
 ## 5. Architecture decisions — open
@@ -187,7 +188,6 @@ Free, no API key, no rate limits, no attribution requirement.
 | Release | Signing, distribution channel, and whether over-the-air updates are used |
 | Quality | CI — still blocked on there being a git remote |
 | Quality | Whether `make check` is enforced by a pre-commit hook |
-| Quality | Coverage thresholds |
 | Web | `Swipeable` degrades on web, so currency removal is weak in the preview. Acceptable while web is preview-only; revisit if web ever ships |
 
 ## 6. System structure

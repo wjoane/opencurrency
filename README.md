@@ -70,13 +70,22 @@ uses `docker compose` when that plugin is installed.
 | Command | Purpose |
 | --- | --- |
 | `make up` | Start the Expo development server for browser and device testing. |
+| `make clear` | Start Expo after clearing the Metro cache. |
+| `make tunnel` | Start Expo through a tunnel when the device is not on the same network. |
 | `make down` | Stop the development containers. |
 | `make test` | Run the Jest test suite. |
 | `make check` | Run linting, formatting, type checks, unused-code checks, and coverage. |
 | `make export-web` | Export a static web preview to `dist/`. |
+| `make clean` | Stop containers and remove generated build and Expo project caches. |
+| `make reset` | Remove generated output, dependencies, Docker volumes, caches, and EAS login state. |
 
 `make check` is the required quality gate for every change. It runs entirely in
 Docker and is the fastest way to verify a contribution before opening a pull request.
+`make reset` is intentionally destructive and should be reserved for rebuilding the
+entire local container environment from scratch.
+
+The development image includes GNU Make so the test suite can verify housekeeping
+target expansion without executing destructive commands.
 
 ## How it works
 

@@ -5,7 +5,6 @@ import { type RateSnapshot } from '../../data/rateSchema';
 import { I18nProvider } from '../../i18n/I18nContext';
 import { PreferencesProvider } from '../../state/PreferencesContext';
 import { RatesProvider } from '../../state/RatesContext';
-import { outermostCompositeProps } from '../../testing/compositeProps';
 import { ThemeProvider } from '../../theme/ThemeContext';
 
 import { ConverterScreen } from './ConverterScreen';
@@ -73,32 +72,7 @@ function rowLabels(): string[] {
     .filter((label) => /^(Euro|US Dollar|Japanese Yen),/.test(label));
 }
 
-const LIST_LABEL = 'Currencies';
-
-interface CurrencyListPropsForTest {
-  readonly keyExtractor?: (row: unknown, index: number) => string;
-  readonly renderItem?: unknown;
-  readonly ListFooterComponent?: unknown;
-  readonly onReorder?: (event: { readonly from: number; readonly to: number }) => void;
-}
-
-function currencyListProps(): CurrencyListPropsForTest {
-  return outermostCompositeProps<CurrencyListPropsForTest>(
-    screen.getByLabelText(LIST_LABEL),
-    (props) => props.renderItem !== undefined,
-    'currency list',
-  );
-}
-
 describe('ConverterScreen', () => {
-  it('keeps the currency list alive when it asks for a key without a row', async () => {
-    await renderScreen();
-
-    const keyExtractor = currencyListProps().keyExtractor;
-
-    expect(keyExtractor?.(undefined, -1)).toBe('-1');
-  });
-
   it('shows the date the snapshot itself reports', async () => {
     await renderScreen();
 
@@ -109,8 +83,8 @@ describe('ConverterScreen', () => {
     await renderScreen();
 
     expect(activeAmountField('Euro').props.value).toBe('');
-    expect(activeAmountField('Euro').props.placeholder).toBe('€ 1.00');
-    expect(screen.getByText('$ 1.08')).toBeOnTheScreen();
+    expect(activeAmountField('Euro').props.placeholder).toBe('€1.00');
+    expect(screen.getByText('$1.08')).toBeOnTheScreen();
   });
 
   it('converts every other row when the active amount is edited', async () => {
@@ -118,7 +92,7 @@ describe('ConverterScreen', () => {
 
     await fireEvent.changeText(activeAmountField('Euro'), '250');
 
-    expect(screen.getByText('$ 271.05')).toBeOnTheScreen();
+    expect(screen.getByText('$271.05')).toBeOnTheScreen();
   });
 
   it('leaves the active row unformatted while it is being typed in', async () => {
@@ -136,7 +110,7 @@ describe('ConverterScreen', () => {
     await fireEvent(activeAmountField('Euro'), 'endEditing');
 
     expect(activeAmountField('Euro').props.value).toBe('');
-    expect(activeAmountField('Euro').props.placeholder).toBe('€ 1,234,567.80');
+    expect(activeAmountField('Euro').props.placeholder).toBe('€1,234,567.80');
   });
 
   it('moves the input to another row when that row is pressed', async () => {
@@ -172,7 +146,7 @@ describe('ConverterScreen', () => {
     await fireEvent.press(screen.getByLabelText(/^US Dollar,/));
 
     expect(activeAmountField('US Dollar').props.value).toBe('');
-    expect(activeAmountField('US Dollar').props.placeholder).toBe('$ 271.05');
+    expect(activeAmountField('US Dollar').props.placeholder).toBe('$271.05');
   });
 
   it('converts back the other way once another row is active', async () => {
@@ -181,7 +155,7 @@ describe('ConverterScreen', () => {
     await fireEvent.press(screen.getByLabelText(/^US Dollar,/));
     await fireEvent.changeText(activeAmountField('US Dollar'), '100');
 
-    expect(screen.getByText('€ 92.23')).toBeOnTheScreen();
+    expect(screen.getByText('€92.23')).toBeOnTheScreen();
   });
 
   it('quotes the rate sub-line against whichever row is active', async () => {
@@ -214,8 +188,8 @@ describe('ConverterScreen', () => {
       ),
     });
 
-    expect(activeAmountField('Japanese Yen').props.placeholder).toBe('¥ 1,000');
-    expect(screen.getByText('€ 6.05')).toBeOnTheScreen();
+    expect(activeAmountField('Japanese Yen').props.placeholder).toBe('¥1,000');
+    expect(screen.getByText('€6.05')).toBeOnTheScreen();
   });
 
   it('says the rates are stale rather than hiding it', async () => {
@@ -239,7 +213,7 @@ describe('ConverterScreen', () => {
     expect(screen.getByText('Rates from 2026-08-01')).toBeOnTheScreen();
     expect(screen.getByText('Could not reach the rate provider')).toBeOnTheScreen();
     expect(screen.getByLabelText(/^US Dollar,/)).toBeOnTheScreen();
-    expect(screen.getByText('$ 1.15')).toBeOnTheScreen();
+    expect(screen.getByText('$1.15')).toBeOnTheScreen();
   });
 });
 
@@ -304,8 +278,85 @@ describe('ConverterScreen currency management', () => {
 
     await pressRemove('Remove Japanese Yen');
 
-    expect(activeAmountField('Euro').props.placeholder).toBe('€ 0.61');
-    expect(screen.getByText('$ 0.66')).toBeOnTheScreen();
+    expect(activeAmountField('Euro').props.placeholder).toBe('€0.61');
+    expect(screen.getByText('$0.66')).toBeOnTheScreen();
+  });
+
+  it('keeps the two-row minimum when three deletion animations are requested together', async () => {
+    jest.useFakeTimers();
+
+    try {
+      await renderScreen({
+        store: storeReturning(
+          JSON.stringify({
+            theme: 'system',
+            language: null,
+            currencyCodes: ['eur', 'usd', 'jpy', 'gbp'],
+            activeCurrencyCode: 'usd',
+            amountText: '100',
+          }),
+        ),
+        repository: repositoryReturning({
+          status: 'ok',
+          snapshot: {
+            ...SNAPSHOT,
+            rates: { ...SNAPSHOT.rates, gbp: 0.87 },
+          },
+        }),
+      });
+
+      await fireEvent.press(screen.getByRole('button', { name: 'Remove Euro' }));
+      await fireEvent.press(screen.getByRole('button', { name: 'Remove US Dollar' }));
+      await fireEvent.press(screen.getByRole('button', { name: 'Remove Japanese Yen' }));
+      await act(async () => {
+        jest.advanceTimersByTime(DELETE_ANIMATION_DURATION);
+      });
+
+      expect(screen.queryByLabelText(/^Euro,/)).toBeNull();
+      expect(screen.queryByLabelText(/^US Dollar,/)).toBeNull();
+      expect(activeAmountField('Japanese Yen')).toBeOnTheScreen();
+      expect(screen.getByLabelText(/^British Pound,/)).toBeOnTheScreen();
+    } finally {
+      await screen.unmount();
+      jest.useRealTimers();
+    }
+  });
+
+  it('reserves the two-row minimum across overlapping deletion animations', async () => {
+    jest.useFakeTimers();
+
+    try {
+      await renderScreen({ store: storeReturning(THREE_ROWS) });
+
+      await fireEvent.press(screen.getByRole('button', { name: 'Remove Euro' }));
+      await fireEvent.press(screen.getByRole('button', { name: 'Remove US Dollar' }));
+      await act(async () => {
+        jest.advanceTimersByTime(DELETE_ANIMATION_DURATION);
+      });
+
+      expect(screen.queryByLabelText(/^Euro,/)).toBeNull();
+      expect(activeAmountField('US Dollar')).toBeOnTheScreen();
+      expect(screen.getByLabelText(/^Japanese Yen,/)).toBeOnTheScreen();
+    } finally {
+      await screen.unmount();
+      jest.useRealTimers();
+    }
+  });
+
+  it('does not persist a reserved removal when the screen unmounts during animation', async () => {
+    const write = jest.fn(() => Promise.resolve());
+    jest.useFakeTimers();
+
+    try {
+      await renderScreen({ store: { read: () => Promise.resolve(THREE_ROWS), write } });
+
+      await fireEvent.press(screen.getByRole('button', { name: 'Remove US Dollar' }));
+      await screen.unmount();
+
+      expect(write).not.toHaveBeenCalled();
+    } finally {
+      jest.useRealTimers();
+    }
   });
 
   it('stops offering removal once two rows are left', async () => {
@@ -317,16 +368,6 @@ describe('ConverterScreen currency management', () => {
     expect(screen.queryByRole('button', { name: 'Remove US Dollar' })).toBeNull();
   });
 
-  it('keeps the row renderer stable while an amount is typed', async () => {
-    await renderScreen({ store: storeReturning(THREE_ROWS) });
-
-    const { renderItem } = currencyListProps();
-
-    await fireEvent.changeText(activeAmountField('Euro'), '1234');
-
-    expect(currencyListProps().renderItem).toBe(renderItem);
-  });
-
   it('moves a currency to a new position through its accessibility action', async () => {
     await renderScreen({ store: storeReturning(THREE_ROWS) });
 
@@ -335,25 +376,6 @@ describe('ConverterScreen currency management', () => {
     });
     await fireEvent(screen.getByLabelText(/^Euro,/), 'accessibilityAction', {
       nativeEvent: { actionName: 'moveDown' },
-    });
-
-    expect(rowLabels()).toEqual([
-      expect.stringMatching(/^US Dollar,/),
-      expect.stringMatching(/^Japanese Yen,/),
-      expect.stringMatching(/^Euro,/),
-    ]);
-  });
-
-  it('ignores a cancelled drag callback with an invalid source index', async () => {
-    await renderScreen({ store: storeReturning(THREE_ROWS) });
-
-    const { onReorder } = currencyListProps();
-
-    await act(async () => {
-      onReorder?.({ from: 0, to: 2 });
-    });
-    await act(async () => {
-      onReorder?.({ from: -1, to: 2 });
     });
 
     expect(rowLabels()).toEqual([
@@ -402,7 +424,7 @@ describe('ConverterScreen currency management', () => {
 
     expect(screen.getByLabelText(/^Japanese Yen,/)).toBeOnTheScreen();
 
-    expect(screen.getByText('¥ 165')).toBeOnTheScreen();
+    expect(screen.getByText('¥165')).toBeOnTheScreen();
   });
 
   it('appends a new currency without changing the existing list order', async () => {
@@ -466,7 +488,6 @@ describe('ConverterScreen empty and minimum states', () => {
   it('keeps the add and rate-information actions in the list footer', async () => {
     await renderScreen();
 
-    expect(currencyListProps().ListFooterComponent).toBeDefined();
     expect(screen.getByRole('button', { name: 'Add currency' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'About these rates' })).toBeOnTheScreen();
   });

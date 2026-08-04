@@ -2,6 +2,8 @@
 
 import appData from '../../assets/app-data.json';
 
+import { normaliseCurrencyCode } from './currencyCode';
+
 export interface BundledCurrency {
   readonly name: string;
   readonly rate: number | null;
@@ -11,7 +13,7 @@ export interface BundledCurrency {
   readonly isIso4217: boolean;
 }
 
-export const CURRENCIES: Readonly<Record<string, BundledCurrency>> = appData.currencies;
+const CURRENCIES: Readonly<Record<string, BundledCurrency>> = appData.currencies;
 
 export const CURRENCY_SEED: Readonly<Record<string, string>> = Object.fromEntries(
   Object.entries(CURRENCIES).map(([code, currency]) => [code, currency.name]),
@@ -27,5 +29,9 @@ export const BUNDLED_RATES_DOCUMENT = {
 };
 
 export function getBundledCurrency(currencyCode: string): BundledCurrency | null {
-  return CURRENCIES[currencyCode.trim().toLowerCase()] ?? null;
+  return CURRENCIES[normaliseCurrencyCode(currencyCode)] ?? null;
+}
+
+export function isOfferedCurrency(currencyCode: string): boolean {
+  return getBundledCurrency(currencyCode) !== null;
 }

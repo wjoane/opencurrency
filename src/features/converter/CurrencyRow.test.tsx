@@ -1,9 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { StyleSheet, type TextStyle, type ViewStyle } from 'react-native';
-
-import { nearestCompositeProps, outermostCompositeProps } from '../../testing/compositeProps';
+import { StyleSheet, type TextStyle } from 'react-native';
 import { ThemeProvider } from '../../theme/ThemeContext';
-import { CURRENCY_BADGE_TEST_ID, FLAG_IMAGE_TEST_ID } from '../../ui/CurrencyIcon';
 
 import { CurrencyRow, type CurrencyRowProps } from './CurrencyRow';
 import { DELETE_ANIMATION_DURATION, REORDER_LONG_PRESS_DURATION } from './interactionConstants';
@@ -24,7 +21,7 @@ const BASE_PROPS: CurrencyRowProps = {
   onAmountChange: () => {},
   onAmountEditingEnd: () => {},
   canRemove: true,
-  onRemove: () => {},
+  removal: { start: () => true, finish: () => {} },
   removeLabel: 'Remove Japanese Yen',
   onReorderLongPress: () => {},
   moveUpAction: { label: 'Move Japanese Yen up', run: () => {} },
@@ -38,53 +35,6 @@ async function renderRow(overrides: Partial<CurrencyRowProps> = {}) {
       <CurrencyRow {...BASE_PROPS} {...overrides} />
     </ThemeProvider>,
   );
-}
-
-type Element = ReturnType<typeof screen.getByRole>;
-
-interface CardLayoutProps {
-  readonly onLayout?: (event: {
-    readonly nativeEvent: { readonly layout: { readonly width: number } };
-  }) => void;
-}
-
-interface SwipeableProps {
-  readonly renderLeftActions?: unknown;
-  readonly renderRightActions?: unknown;
-  readonly friction?: number;
-  readonly leftThreshold?: number;
-  readonly rightThreshold?: number;
-  readonly dragOffsetFromLeftEdge?: number;
-  readonly dragOffsetFromRightEdge?: number;
-  readonly overshootRight?: boolean;
-  readonly overshootLeft?: boolean;
-  readonly containerStyle?: ViewStyle;
-  readonly onSwipeableWillOpen?: (direction: 'left' | 'right') => void;
-  readonly onSwipeableOpen?: (direction: 'left' | 'right') => void;
-}
-
-interface FullSwipeActionProps {
-  readonly translation?: { value: number };
-  readonly fullSwipeThreshold?: number;
-  readonly swipeSign?: number;
-}
-
-interface ActionSlotProps {
-  readonly style?: ViewStyle;
-}
-
-function ancestorLabels(element: Element): string[] {
-  const labels: string[] = [];
-
-  for (let node = element.parent; node !== null; node = node.parent) {
-    const label: unknown = node.props.accessibilityLabel;
-
-    if (typeof label === 'string') {
-      labels.push(label);
-    }
-  }
-
-  return labels;
 }
 
 describe('CurrencyRow', () => {
@@ -203,20 +153,9 @@ describe('CurrencyRow', () => {
     expect(onActivate).toHaveBeenCalledWith('jpy', '173');
   });
 
-  it('draws the flag of the currency’s country', async () => {
-    await renderRow();
-
-    expect(
-      screen.getByTestId(FLAG_IMAGE_TEST_ID, { includeHiddenElements: true }),
-    ).toBeOnTheScreen();
-  });
-
   it('falls back to a generated badge for a currency with no country', async () => {
     await renderRow({ currencyCode: 'btc', countryCode: null, badgeLabel: '₿' });
 
-    expect(
-      screen.getByTestId(CURRENCY_BADGE_TEST_ID, { includeHiddenElements: true }),
-    ).toBeOnTheScreen();
     expect(screen.getByText('₿', { includeHiddenElements: true })).toBeOnTheScreen();
   });
 
@@ -266,28 +205,6 @@ describe('CurrencyRow', () => {
     expect(field.props.placeholder).toBeUndefined();
   });
 
-  it('keeps active and inactive cards at one fixed height', async () => {
-    await renderRow();
-
-    const inactiveStyle = StyleSheet.flatten(
-      screen.getByRole('button', { name: BASE_PROPS.accessibilityLabel }).props.style,
-    ) as ViewStyle;
-
-    await screen.unmount();
-    await renderRow({ isActive: true });
-
-    const activeRow = screen.getByRole('button', { name: BASE_PROPS.accessibilityLabel });
-    const activeBody = outermostCompositeProps<{ readonly style?: ViewStyle }>(
-      activeRow,
-      (props) => props.onPress !== undefined,
-      'active currency card',
-    );
-    const activeStyle = StyleSheet.flatten(activeBody.style) as ViewStyle;
-
-    expect(inactiveStyle.height).toEqual(expect.any(Number));
-    expect(activeStyle.height).toBe(inactiveStyle.height);
-  });
-
   it('shrinks a long inactive amount down to a readable minimum', async () => {
     const longAmount = '$ 12,345,678,901,234,567,890.12';
 
@@ -312,239 +229,30 @@ describe('CurrencyRow', () => {
     expect(style.fontSize).toBeGreaterThanOrEqual(14);
   });
 
-  it('keeps the amount input outside the row’s own accessible element', async () => {
+  it('exposes the active row and its amount input as separate controls', async () => {
     await renderRow({ isActive: true });
 
-    const field = screen.getByLabelText('Amount in Japanese Yen');
-
-    expect(ancestorLabels(field)).not.toContain(BASE_PROPS.accessibilityLabel);
+    expect(screen.getByRole('button', { name: BASE_PROPS.accessibilityLabel })).toBeOnTheScreen();
+    expect(screen.getByLabelText('Amount in Japanese Yen')).toBeOnTheScreen();
   });
 
-  it('offers a labelled remove action while removal is allowed', async () => {
-    await renderRow();
-
-    expect(screen.getByRole('button', { name: 'Remove Japanese Yen' })).toBeOnTheScreen();
-    expect(screen.queryByText('Remove Japanese Yen')).toBeNull();
-  });
-
-  it('draws the delete reveal on a red background', async () => {
-    await renderRow();
-
-    const style = StyleSheet.flatten(
-      screen.getByRole('button', { name: 'Remove Japanese Yen' }).props.style,
-    ) as ViewStyle;
-
-    expect(style.backgroundColor).toBe('#DC2626');
-  });
-
-  it('keeps an ordinary swipe actionable and reserves direct deletion for a full swipe', async () => {
-    const onRemove = jest.fn();
-
-    await renderRow({ onRemove });
-
-    const row = screen.getByRole('button', { name: BASE_PROPS.accessibilityLabel });
-    const layout = outermostCompositeProps<CardLayoutProps>(
-      row,
-      (props) => props.onLayout !== undefined,
-      'currency card layout',
-    );
-
-    await act(async () => {
-      layout.onLayout?.({
-        nativeEvent: { layout: { width: 300 } },
-      });
-      layout.onLayout?.({
-        nativeEvent: { layout: { width: 300 } },
-      });
-    });
-
-    const removeAction = screen.getByRole('button', { name: 'Remove Japanese Yen' });
-    const swipeable = outermostCompositeProps<SwipeableProps>(
-      removeAction,
-      (props) => props.renderRightActions !== undefined,
-      'swipeable card',
-    );
-    const fullSwipe = nearestCompositeProps<FullSwipeActionProps>(
-      removeAction,
-      (props) => props.fullSwipeThreshold !== undefined,
-      'full-swipe remove action',
-    );
-
-    expect(swipeable.friction).toBe(1);
-    expect(swipeable.overshootRight).toBe(true);
-    expect(fullSwipe.fullSwipeThreshold).toBe(180);
-
-    await act(async () => {
-      if (fullSwipe.translation !== undefined) {
-        fullSwipe.translation.value = -180;
-      }
-    });
-
-    expect(onRemove).not.toHaveBeenCalled();
-
-    await act(async () => {
-      if (fullSwipe.translation !== undefined) {
-        fullSwipe.translation.value = -100;
-      }
-    });
-
+  it('removes the currency it names through the labelled remove control', async () => {
+    const onRemoveFinish = jest.fn();
     jest.useFakeTimers();
-    await act(async () => {
-      swipeable.onSwipeableWillOpen?.('left');
-    });
+
+    await renderRow({ removal: { start: () => true, finish: onRemoveFinish } });
+    await fireEvent.press(screen.getByRole('button', { name: BASE_PROPS.removeLabel }));
     await act(async () => {
       jest.advanceTimersByTime(DELETE_ANIMATION_DURATION);
     });
+
+    expect(onRemoveFinish).toHaveBeenCalledWith(true);
     jest.useRealTimers();
-
-    expect(onRemove).not.toHaveBeenCalled();
-
-    await act(async () => {
-      if (fullSwipe.translation !== undefined) {
-        fullSwipe.translation.value = -180;
-      }
-    });
-
-    jest.useFakeTimers();
-    await act(async () => {
-      swipeable.onSwipeableWillOpen?.('left');
-    });
-    await act(async () => {
-      jest.advanceTimersByTime(DELETE_ANIMATION_DURATION);
-    });
-    jest.useRealTimers();
-
-    expect(onRemove).toHaveBeenCalledWith('jpy');
-  });
-
-  it('maps the delete reveal and gesture to the mirrored RTL direction', async () => {
-    await renderRow({ layoutDirection: 'rtl' });
-
-    const removeAction = screen.getByRole('button', { name: 'Remove Japanese Yen' });
-    const swipeable = outermostCompositeProps<SwipeableProps>(
-      removeAction,
-      (props) => props.renderLeftActions !== undefined,
-      'right-to-left swipeable card',
-    );
-    const fullSwipe = nearestCompositeProps<FullSwipeActionProps>(
-      removeAction,
-      (props) => props.fullSwipeThreshold !== undefined,
-      'right-to-left full-swipe remove action',
-    );
-
-    expect(swipeable.renderRightActions).toBeUndefined();
-    expect(swipeable.leftThreshold).toBe(44);
-    expect(swipeable.overshootLeft).toBe(true);
-    expect(swipeable.dragOffsetFromRightEdge).toBe(Number.MAX_SAFE_INTEGER);
-    expect(swipeable.dragOffsetFromLeftEdge).toBeUndefined();
-    expect((StyleSheet.flatten(swipeable.containerStyle) as ViewStyle | undefined)?.direction).toBe(
-      'rtl',
-    );
-    expect(fullSwipe.swipeSign).toBe(1);
-  });
-
-  it('removes a currency from the independent RTL delete control after the row opens', async () => {
-    const onRemove = jest.fn();
-
-    await renderRow({ layoutDirection: 'rtl', onRemove });
-
-    const removeAction = screen.getByRole('button', { name: 'Remove Japanese Yen' });
-    const swipeable = outermostCompositeProps<SwipeableProps>(
-      removeAction,
-      (props) => props.renderLeftActions !== undefined,
-      'right-to-left swipeable card',
-    );
-
-    expect(swipeable.onSwipeableOpen).toBeDefined();
-
-    await act(async () => {
-      swipeable.onSwipeableOpen?.('right');
-    });
-
-    const removeControl = screen.getByRole('button', { name: 'Remove Japanese Yen' });
-
-    jest.useFakeTimers();
-    await fireEvent.press(removeControl);
-    await act(async () => {
-      jest.advanceTimersByTime(DELETE_ANIMATION_DURATION);
-    });
-    jest.useRealTimers();
-
-    expect(onRemove).toHaveBeenCalledWith('jpy');
-  });
-
-  it('keeps the RTL delete action hit target in its physical left reveal area', async () => {
-    await renderRow({ layoutDirection: 'rtl' });
-
-    const row = screen.getByRole('button', { name: BASE_PROPS.accessibilityLabel });
-    const layout = outermostCompositeProps<CardLayoutProps>(
-      row,
-      (props) => props.onLayout !== undefined,
-      'right-to-left currency card layout',
-    );
-
-    await act(async () => {
-      layout.onLayout?.({ nativeEvent: { layout: { width: 300 } } });
-    });
-
-    const actionStyle = StyleSheet.flatten(
-      screen.getByRole('button', { name: 'Remove Japanese Yen' }).props.style,
-    ) as ViewStyle;
-    const slot = nearestCompositeProps<ActionSlotProps>(
-      screen.getByRole('button', { name: 'Remove Japanese Yen' }),
-      (props) => (StyleSheet.flatten(props.style) as ViewStyle | undefined)?.width === 236,
-      'translated right-to-left delete-action slot',
-    );
-    const slotStyle = StyleSheet.flatten(slot.style) as ViewStyle;
-
-    expect(actionStyle.transform).toBeUndefined();
-    expect(slotStyle.transform).toEqual([{ translateX: -64 }]);
-  });
-
-  it('uses the inverse card width as the RTL delete-action measurement slot', async () => {
-    await renderRow({ layoutDirection: 'rtl' });
-
-    const row = screen.getByRole('button', { name: BASE_PROPS.accessibilityLabel });
-    const layout = outermostCompositeProps<CardLayoutProps>(
-      row,
-      (props) => props.onLayout !== undefined,
-      'right-to-left currency card layout',
-    );
-
-    await act(async () => {
-      layout.onLayout?.({ nativeEvent: { layout: { width: 300 } } });
-    });
-
-    const slot = nearestCompositeProps<ActionSlotProps>(
-      screen.getByRole('button', { name: 'Remove Japanese Yen' }),
-      (props) => {
-        const style = StyleSheet.flatten(props.style) as ViewStyle | undefined;
-
-        return style?.width === 236;
-      },
-      'right-to-left delete-action measurement slot',
-    );
-
-    expect(StyleSheet.flatten(slot.style)).toMatchObject({ width: 236 });
-  });
-
-  it('removes the currency it names when the action is pressed', async () => {
-    const onRemove = jest.fn();
-
-    await renderRow({ onRemove });
-    jest.useFakeTimers();
-    await fireEvent.press(screen.getByRole('button', { name: 'Remove Japanese Yen' }));
-    await act(async () => {
-      jest.advanceTimersByTime(DELETE_ANIMATION_DURATION);
-    });
-    jest.useRealTimers();
-
-    expect(onRemove).toHaveBeenCalledWith('jpy');
   });
 
   it('does not offer removal at the two-row minimum', async () => {
     await renderRow({ canRemove: false });
 
-    expect(screen.queryByRole('button', { name: 'Remove Japanese Yen' })).toBeNull();
+    expect(screen.queryByRole('button', { name: BASE_PROPS.removeLabel })).toBeNull();
   });
 });

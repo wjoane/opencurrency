@@ -69,29 +69,21 @@ describe('createSnapshotStore', () => {
     expect(await store.readNewest()).toEqual(snapshot('2026-07-27', 1.17));
   });
 
-  it('moves a date to the front of the LRU order when it is read', async () => {
+  it('does not rewrite the cache index when a snapshot is read', async () => {
     const store = createSnapshotStore();
 
     await store.write(snapshot('2026-07-25'));
     await store.write(snapshot('2026-07-26'));
-    await store.read('2026-07-25');
-
-    expect(await storedIndex()).toEqual(['2026-07-25', '2026-07-26']);
-  });
-
-  it('does not rewrite the index when the read does not change the order', async () => {
-    const store = createSnapshotStore();
-
-    await store.write(snapshot('2026-07-27'));
     const { setItem } = jest.mocked(AsyncStorage);
     setItem.mockClear();
 
-    await store.read('2026-07-27');
+    await store.read('2026-07-25');
 
     expect(setItem).not.toHaveBeenCalled();
+    expect(await storedIndex()).toEqual(['2026-07-26', '2026-07-25']);
   });
 
-  it('evicts the least recently used snapshot once the cap is exceeded', async () => {
+  it('evicts the oldest written snapshot once the cap is exceeded', async () => {
     const store = createSnapshotStore();
 
     for (let day = 0; day <= MAX_SNAPSHOTS; day += 1) {
@@ -163,5 +155,25 @@ describe('createSnapshotStore', () => {
 
     await expect(store.write(snapshot('2026-07-27'))).resolves.toBeUndefined();
     expect(await store.read('2026-07-27')).toBeNull();
+  });
+
+  it('treats a snapshot read failure as a cache miss', async () => {
+    const store = createSnapshotStore();
+    const { getItem } = jest.mocked(AsyncStorage);
+    getItem
+      .mockResolvedValueOnce(JSON.stringify(['2026-07-27']))
+      .mockRejectedValueOnce(new Error('storage unavailable'));
+
+    await expect(store.read('2026-07-27')).resolves.toBeNull();
+  });
+
+  it('treats a newest-snapshot read failure as an empty cache', async () => {
+    const store = createSnapshotStore();
+    const { getItem } = jest.mocked(AsyncStorage);
+    getItem
+      .mockResolvedValueOnce(JSON.stringify(['2026-07-27']))
+      .mockRejectedValueOnce(new Error('storage unavailable'));
+
+    await expect(store.readNewest()).resolves.toBeNull();
   });
 });

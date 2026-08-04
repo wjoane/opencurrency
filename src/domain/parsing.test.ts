@@ -1,4 +1,3 @@
-import { toDecimalString } from './money';
 import { parseAmount } from './parsing';
 
 function parsed(input: string): string {
@@ -8,7 +7,7 @@ function parsed(input: string): string {
     throw new Error(`expected ${JSON.stringify(input)} to parse`);
   }
 
-  return toDecimalString(amount);
+  return amount.toFixed();
 }
 
 describe('parseAmount', () => {

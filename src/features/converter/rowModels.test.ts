@@ -38,8 +38,8 @@ describe('buildCurrencyRows', () => {
   it('converts every inactive row from the active one', () => {
     const rows = build();
 
-    expect(row(rows, 'usd').amountText).toBe('$ 108.42');
-    expect(row(rows, 'jpy').amountText).toBe('¥ 16,523');
+    expect(row(rows, 'usd').amountText).toBe('$108.42');
+    expect(row(rows, 'jpy').amountText).toBe('¥16,523');
   });
 
   it('rounds each row to its own currency precision', () => {
@@ -50,7 +50,7 @@ describe('buildCurrencyRows', () => {
     const rows = build({ amountText: '1234567.8' });
 
     expect(row(rows, 'eur').amountText).toBe('1234567.8');
-    expect(row(rows, 'usd').amountText).toBe('$ 1,338,518.41');
+    expect(row(rows, 'usd').amountText).toBe('$1,338,518.41');
   });
 
   it('quotes the sub-line against the active currency', () => {
@@ -78,7 +78,7 @@ describe('buildCurrencyRows', () => {
   it('hands the next active row an ungrouped, re-parseable amount', () => {
     const rows = build({ amountText: '1000000' });
 
-    expect(row(rows, 'jpy').amountText).toBe('¥ 165,230,000');
+    expect(row(rows, 'jpy').amountText).toBe('¥165,230,000');
     expect(row(rows, 'jpy').editableAmountText).toBe('165230000');
   });
 
@@ -102,29 +102,29 @@ describe('buildCurrencyRows', () => {
   });
 
   it('announces the currency by name and by amount, not by raw code', () => {
-    expect(row(build(), 'usd').accessibilityLabel).toContain('$ 108.42');
+    expect(row(build(), 'usd').accessibilityLabel).toContain('$108.42');
     expect(row(build(), 'usd').accessibilityLabel).not.toMatch(/^usd/);
   });
 
   it('formats through the locale rather than assuming English separators', () => {
     const rows = build({ amountText: '1000000', locale: 'de' });
 
-    expect(row(rows, 'usd').amountText).toBe('$ 1.084.200,00');
+    expect(row(rows, 'usd').amountText).toBe('1.084.200,00 $');
   });
 
   it('carries a formatted placeholder alongside the active row’s raw text', () => {
     const rows = build({ amountText: '1234567.8' });
 
     expect(row(rows, 'eur').amountText).toBe('1234567.8');
-    expect(row(rows, 'eur').placeholderAmountText).toBe('€ 1,234,567.80');
+    expect(row(rows, 'eur').placeholderAmountText).toBe('€1,234,567.80');
   });
 
   it('marks and announces only the active row in formatted presentation mode', () => {
     const rows = build({ formatActiveAmount: true });
 
     expect(row(rows, 'eur').isAmountFormatted).toBe(true);
-    expect(row(rows, 'eur').amountText).toBe('€ 100.00');
-    expect(row(rows, 'eur').accessibilityLabel).toContain('€ 100.00');
+    expect(row(rows, 'eur').amountText).toBe('€100.00');
+    expect(row(rows, 'eur').accessibilityLabel).toContain('€100.00');
     expect(row(rows, 'usd').isAmountFormatted).toBe(false);
   });
 

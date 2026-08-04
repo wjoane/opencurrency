@@ -4,7 +4,7 @@ import { convertAmount, type RateTable } from '../../domain/conversion';
 import { getCountryCode, getSymbol } from '../../domain/currencyMetadata';
 import { getCurrencyName } from '../../domain/currencyCatalogue';
 import { formatAmount, formatRate, toDisplayDecimalString } from '../../domain/formatting';
-import { fromNumber, type MoneyAmount } from '../../domain/money';
+import { one } from '../../domain/money';
 import { parseAmount } from '../../domain/parsing';
 import { type Translate } from '../../i18n';
 
@@ -12,45 +12,28 @@ export interface CurrencyRowModel {
   readonly currencyCode: string;
   readonly currencyName: string;
   readonly countryCode: string | null;
-
   readonly badgeLabel: string;
-
   readonly amountText: string;
-
   readonly placeholderAmountText: string;
-
   readonly editableAmountText: string;
   readonly rateText: string | null;
   readonly isActive: boolean;
-
   readonly isAmountFormatted: boolean;
   readonly accessibilityLabel: string;
-
   readonly amountAccessibilityLabel: string;
 }
 
 export interface CurrencyRowsInput {
   readonly currencyCodes: readonly string[];
   readonly activeCurrencyCode: string;
-
   readonly amountText: string;
-
   readonly formatActiveAmount: boolean;
   readonly rates: RateTable;
   readonly locale: string;
   readonly t: Translate;
 }
 
-const ONE = fromNumber(1);
-
-function convertOrNull(
-  amount: MoneyAmount | null,
-  fromCurrencyCode: string,
-  toCurrencyCode: string,
-  rates: RateTable,
-): MoneyAmount | null {
-  return amount === null ? null : convertAmount(amount, fromCurrencyCode, toCurrencyCode, rates);
-}
+const ONE = one();
 
 function buildRateText(
   currencyCode: string,
@@ -64,7 +47,7 @@ function buildRateText(
     return null;
   }
 
-  const rate = convertOrNull(ONE, activeCurrencyCode, currencyCode, rates);
+  const rate = convertAmount(ONE, activeCurrencyCode, currencyCode, rates);
 
   if (rate === null) {
     return null;
@@ -80,7 +63,11 @@ function buildRateText(
 function buildRow(currencyCode: string, input: CurrencyRowsInput): CurrencyRowModel {
   const { activeCurrencyCode, amountText, rates, locale, t } = input;
   const isActive = currencyCode === activeCurrencyCode;
-  const converted = convertOrNull(parseAmount(amountText), activeCurrencyCode, currencyCode, rates);
+  const parsedAmount = parseAmount(amountText);
+  const converted =
+    parsedAmount === null
+      ? null
+      : convertAmount(parsedAmount, activeCurrencyCode, currencyCode, rates);
 
   const formatted =
     converted === null
@@ -106,6 +93,6 @@ function buildRow(currencyCode: string, input: CurrencyRowsInput): CurrencyRowMo
   };
 }
 
-export function buildCurrencyRows(input: CurrencyRowsInput): readonly CurrencyRowModel[] {
+export function buildCurrencyRows(input: CurrencyRowsInput): CurrencyRowModel[] {
   return input.currencyCodes.map((currencyCode) => buildRow(currencyCode, input));
 }

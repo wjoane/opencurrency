@@ -3,10 +3,11 @@ import { Text } from 'react-native';
 
 import { type PreferencesStore } from '../data/preferencesStorage';
 
-import { DEFAULT_PREFERENCES, type Preferences } from './preferences';
+import { parsePreferences, type Preferences } from './preferences';
 import { PreferencesProvider, usePreferences } from './PreferencesContext';
 
 const PERSIST_DEBOUNCE_MS = 400;
+const DEFAULT_PREFERENCES = parsePreferences(null);
 
 function stubStore(stored: string | null): PreferencesStore & { write: jest.Mock } {
   return {
@@ -17,7 +18,6 @@ function stubStore(stored: string | null): PreferencesStore & { write: jest.Mock
 
 interface ProbeProps {
   readonly patch?: Partial<Preferences>;
-
   readonly seenThemes?: string[];
 }
 
@@ -52,6 +52,20 @@ async function renderProbe(
 }
 
 describe('PreferencesProvider', () => {
+  it('ignores hydration that finishes after unmount', async () => {
+    let resolveRead!: (value: string | null) => void;
+    const store: PreferencesStore = {
+      read: () => new Promise((resolve) => (resolveRead = resolve)),
+      write: () => Promise.resolve(),
+    };
+
+    await renderProbe(store);
+    await screen.unmount();
+    await act(async () => resolveRead(null));
+
+    expect(screen.queryByText('theme:system')).toBeNull();
+  });
+
   it('hydrates from storage before rendering anything below it', async () => {
     const stored = JSON.stringify({ ...DEFAULT_PREFERENCES, theme: 'dark', amountText: '250' });
     const seenThemes: string[] = [];

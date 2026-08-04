@@ -20,7 +20,7 @@ const FALLBACK_SCHEME: ColorScheme = 'light';
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-export function resolveColorScheme(
+function resolveColorScheme(
   preference: ThemePreference,
   systemScheme: ColorSchemeName | null | undefined,
 ): ColorScheme {
@@ -33,9 +33,7 @@ export function resolveColorScheme(
 
 export interface ThemeProviderProps {
   readonly children: ReactNode;
-
   readonly initialPreference?: ThemePreference;
-
   readonly onPreferenceChange?: (preference: ThemePreference) => void;
 }
 

@@ -1,51 +1,51 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { type RateFetchFailure } from '../../data/ratesApi';
 import { useI18n } from '../../i18n/I18nContext';
 import { type TranslationKey } from '../../i18n';
-import { useRates } from '../../state/RatesContext';
+import { type RatesStatus, useRates } from '../../state/RatesContext';
 import { useTheme } from '../../theme/ThemeContext';
 import { type ThemeTokens } from '../../theme/tokens';
+import { useThemedStyles } from '../../theme/useThemedStyles';
 import { CalendarIcon } from '../../ui/icons';
 import { Sheet } from '../../ui/Sheet';
 
 import { currentRateDate, latestSelectableRateDate } from './dateBounds';
 import { DatePicker } from './DatePicker';
 
-const FAILURE_MESSAGE_KEYS: Readonly<Record<RateFetchFailure, TranslationKey>> = {
-  notFound: 'header.errorNotFound',
-  networkError: 'header.errorNetwork',
-  invalid: 'header.errorInvalid',
-};
-
-const STALE_MESSAGE_KEYS: Readonly<Record<RateFetchFailure, TranslationKey>> = {
-  notFound: 'header.staleNotFound',
-  networkError: 'header.staleNetwork',
-  invalid: 'header.staleInvalid',
+const NOTICE_MESSAGE_KEYS: Readonly<
+  Record<'stale' | 'error', Readonly<Record<RateFetchFailure, TranslationKey>>>
+> = {
+  stale: {
+    notFound: 'header.staleNotFound',
+    networkError: 'header.staleNetwork',
+    invalid: 'header.staleInvalid',
+  },
+  error: {
+    notFound: 'header.errorNotFound',
+    networkError: 'header.errorNetwork',
+    invalid: 'header.errorInvalid',
+  },
 };
 
 const CALENDAR_ICON_SIZE = 20;
-
-function pickerOpensItsOwnDialog(): boolean {
-  return Platform.OS === 'android';
-}
 
 export function RateHeader() {
   const { status, snapshot, failure, reload, selectedDate, selectDate } = useRates();
   const { theme } = useTheme();
   const { t } = useI18n();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
   const [pickerVisible, setPickerVisible] = useState(false);
 
   const today = currentRateDate();
 
-  const pickerDate = selectedDate ?? snapshot?.date ?? today;
+  const pickerDate = selectedDate ?? today;
 
   const maximumDate = latestSelectableRateDate(today, pickerDate);
 
   const dateText =
-    snapshot === null ? t('header.loading') : t('header.ratesFrom', { date: snapshot.date });
+    status === 'loading' ? t('header.loading') : t('header.ratesFrom', { date: snapshot.date });
 
   const noticeKey = noticeKeyFor(status, failure);
 
@@ -61,7 +61,7 @@ export function RateHeader() {
           <CalendarIcon color={theme.colors.primary} size={CALENDAR_ICON_SIZE} />
         </Pressable>
         <Text style={styles.date}>{dateText}</Text>
-        {selectedDate !== null && (
+        {(selectedDate !== null || snapshot.date !== today) && (
           <Pressable
             onPress={() => selectDate(null)}
             accessibilityRole="button"
@@ -103,7 +103,6 @@ export function RateHeader() {
 interface RateDatePickerProps {
   readonly value: string;
   readonly maximumDate: string;
-
   readonly label: string;
   readonly closeLabel: string;
   readonly onChange: (rateDate: string) => void;
@@ -128,7 +127,7 @@ function RateDatePicker({
     />
   );
 
-  if (pickerOpensItsOwnDialog()) {
+  if (Platform.OS === 'android') {
     return picker;
   }
 
@@ -140,18 +139,14 @@ function RateDatePicker({
 }
 
 function noticeKeyFor(
-  status: ReturnType<typeof useRates>['status'],
+  status: RatesStatus,
   failure: RateFetchFailure | null,
 ): TranslationKey | null {
-  if (failure === null) {
+  if (failure === null || (status !== 'stale' && status !== 'error')) {
     return null;
   }
 
-  if (status === 'stale') {
-    return STALE_MESSAGE_KEYS[failure];
-  }
-
-  return status === 'error' ? FAILURE_MESSAGE_KEYS[failure] : null;
+  return NOTICE_MESSAGE_KEYS[status][failure];
 }
 
 function createStyles(theme: ThemeTokens) {

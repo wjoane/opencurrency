@@ -43,11 +43,11 @@
   "settings.language": "ภาษา",
   "settings.language.system": "ตามอุปกรณ์",
   "settings.about": "เกี่ยวกับ",
-  "settings.about.open": "เกี่ยวกับ OpenCurrency",
+  "settings.about.open": "เกี่ยวกับ OpenCurrency",
   "settings.about.tagline": "ตัวแปลงเรียบง่าย แค่นั้น",
   "settings.about.description": "OpenCurrency เป็นตัวแปลงสกุลเงินโอเพนซอร์สขนาดเล็ก ที่ใช้อัตราอ้างอิงรายวันซึ่งเปิดเผยต่อสาธารณะ\nไม่มีบัญชี ไม่มีโฆษณา ไม่มีการติดตาม",
   "settings.about.credits": "ไอคอนธงจัดหาโดย Copyright (c) 2026 HatScripts ภายใต้สัญญาอนุญาต MIT\nอัตราแลกเปลี่ยนจัดหาให้ฟรีจาก currency-api แบบเปิดของ @fawazahmed0",
   "settings.about.licence": "เผยแพร่ภายใต้สัญญาอนุญาต GNU General Public License v3",
-  "settings.about.github": "คุณสามารถร่วมพัฒนาโครงการบน GitHub:\nhttps://github.com/wjoane/opencurrency",
-  "settings.about.buymeacoffee": "คุณสามารถซื้อกาแฟให้ฉันได้หากชอบแอปนี้:\nhttps://buymeacoffee.com/wjoane"
+  "settings.about.github": "คุณสามารถร่วมพัฒนาโครงการบน GitHub:",
+  "settings.about.buymeacoffee": "คุณสามารถซื้อกาแฟให้ฉันได้หากชอบแอปนี้:"
 }

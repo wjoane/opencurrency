@@ -1,9 +1,6 @@
-import {
-  DEFAULT_PREFERENCES,
-  normalisePreferences,
-  parsePreferences,
-  serialisePreferences,
-} from './preferences';
+import { normalisePreferences, parsePreferences, serialisePreferences } from './preferences';
+
+const DEFAULT_PREFERENCES = parsePreferences(null);
 
 describe('parsePreferences', () => {
   it('falls back to the defaults when nothing is stored', () => {
@@ -93,14 +90,12 @@ describe('normalisePreferences', () => {
     expect(next.activeCurrencyCode).toBe('gbp');
   });
 
-  it('returns the same currency array when nothing about it changed', () => {
+  it('returns a normalized currency array when nothing about it changed', () => {
     const currencyCodes = ['eur', 'usd', 'jpy'];
     const preferences = { ...DEFAULT_PREFERENCES, currencyCodes };
 
-    expect(normalisePreferences(preferences).currencyCodes).toBe(currencyCodes);
-    expect(normalisePreferences({ ...preferences, amountText: '12' }).currencyCodes).toBe(
-      currencyCodes,
-    );
+    expect(normalisePreferences(preferences).currencyCodes).toEqual(currencyCodes);
+    expect(normalisePreferences(preferences).currencyCodes).not.toBe(currencyCodes);
   });
 
   it('still returns a normalised array when the stored one needed correcting', () => {

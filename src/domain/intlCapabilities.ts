@@ -1,14 +1,14 @@
+/** Reads locale number-shape and symbol-placement information with safe fallbacks. */
+
 import { baseLocaleTag, lookupByLocaleTag } from './localeTags';
 
 export interface LocaleGroupSizes {
   readonly primary: number;
-
   readonly secondary: number;
 }
 
 interface LocaleSeparators {
   readonly group: string;
-
   readonly decimal: string;
   readonly groupSizes: LocaleGroupSizes;
 }
@@ -275,4 +275,3 @@ export function getCurrencyDisplayName(currencyCode: string, locale: string): st
     return null;
   }
 }
-/** Reads locale number-shape information with safe fallbacks. */

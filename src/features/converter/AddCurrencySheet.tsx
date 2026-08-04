@@ -8,6 +8,7 @@ import { useI18n } from '../../i18n/I18nContext';
 import { type Translate } from '../../i18n';
 import { useTheme } from '../../theme/ThemeContext';
 import { type ThemeTokens } from '../../theme/tokens';
+import { useThemedStyles } from '../../theme/useThemedStyles';
 import { CurrencyIcon } from '../../ui/CurrencyIcon';
 import { Sheet } from '../../ui/Sheet';
 
@@ -33,9 +34,7 @@ function useHasBeenVisible(visible: boolean): boolean {
 export interface AddCurrencySheetProps {
   readonly visible: boolean;
   readonly onClose: () => void;
-
   readonly currencyCodes: readonly string[];
-
   readonly rates: RateTable;
   readonly onAdd: (currencyCode: string) => void;
 }
@@ -49,7 +48,7 @@ export function AddCurrencySheet({
 }: AddCurrencySheetProps) {
   const { theme } = useTheme();
   const { locale, t } = useI18n();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
   const [query, setQuery] = useState('');
 
   const hasBeenVisible = useHasBeenVisible(visible);
@@ -107,7 +106,6 @@ export function AddCurrencySheet({
         renderItem={renderOption}
         accessibilityLabel={t('addCurrency.listLabel')}
         keyboardShouldPersistTaps="handled"
-
         keyboardDismissMode="on-drag"
         ListEmptyComponent={<Text style={styles.empty}>{t('addCurrency.noMatches')}</Text>}
         style={styles.list}
@@ -131,13 +129,11 @@ const CurrencyOptionRow = memo(function CurrencyOptionRow({
   onSelect,
   t,
 }: CurrencyOptionRowProps) {
-  const { theme } = useTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
 
   return (
     <Pressable
       onPress={() => onSelect(option.currencyCode)}
-
       disabled={option.isAlreadyAdded}
       accessibilityRole="button"
       accessibilityState={{ disabled: option.isAlreadyAdded }}

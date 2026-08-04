@@ -97,9 +97,7 @@ function interpolate(template: string, values: TranslationValues | undefined): s
       return marker;
     }
 
-    const value = values[name];
-
-    return value === undefined ? marker : String(value);
+    return String(values[name]);
   });
 }
 

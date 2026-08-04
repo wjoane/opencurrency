@@ -1,4 +1,4 @@
-import { isRateDate, parseRateSnapshot } from './rateSchema';
+import { isRateDate, parseRateSnapshot, parseStoredSnapshot } from './rateSchema';
 
 const JSDELIVR_NOT_FOUND_BODY = "Couldn't find the requested release version 2024-03-01.";
 const PAGES_NOT_FOUND_BODY = '<!DOCTYPE html>\n<html lang="en-US" class="min-height-100vh">';
@@ -126,5 +126,14 @@ describe('parseRateSnapshot', () => {
       expect(result.snapshot.rates.jpy).toBeUndefined();
       expect(result.snapshot.rates.usd).toBe(1.17);
     }
+  });
+});
+
+describe('parseStoredSnapshot', () => {
+  it('rejects missing metadata and empty rate maps', () => {
+    expect(parseStoredSnapshot('{"date":"2026-07-27","rates":{"usd":1.17}}')).toBeNull();
+    expect(
+      parseStoredSnapshot('{"date":"2026-07-27","baseCurrencyCode":"eur","rates":{"usd":0}}'),
+    ).toBeNull();
   });
 });

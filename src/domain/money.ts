@@ -12,9 +12,14 @@ BigDecimal.PE = WORKING_DECIMAL_PLACES;
 
 export type MoneyAmount = BigDecimal;
 
+/** Creates the multiplicative identity used for unit-rate display. */
+export function one(): MoneyAmount {
+  return new BigDecimal(1);
+}
+
 /** Creates a monetary value from a finite number. */
 export function fromNumber(value: number): MoneyAmount | null {
-  return Number.isFinite(value) ? fromDecimalString(String(value)) : null;
+  return fromDecimalString(String(value));
 }
 
 /** Creates a monetary value from a decimal string. */
@@ -28,10 +33,6 @@ export function fromDecimalString(value: string): MoneyAmount | null {
 
 export function decimalExponent(amount: MoneyAmount): number {
   return amount.e;
-}
-
-export function toDecimalString(amount: MoneyAmount): string {
-  return amount.toFixed();
 }
 
 export function toFixedDecimalString(amount: MoneyAmount, decimalPlaces: number): string {

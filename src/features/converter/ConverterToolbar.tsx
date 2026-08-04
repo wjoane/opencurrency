@@ -1,11 +1,11 @@
 /** Renders actions for adding currencies and selecting a date. */
 
-import { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useI18n } from '../../i18n/I18nContext';
 import { useTheme } from '../../theme/ThemeContext';
 import { type ThemeTokens } from '../../theme/tokens';
+import { useThemedStyles } from '../../theme/useThemedStyles';
 import { InfoIcon, PlusIcon } from '../../ui/icons';
 
 const ACTION_ICON_SIZE = 18;
@@ -18,7 +18,7 @@ export interface ConverterToolbarProps {
 export function ConverterToolbar({ onAddCurrency, onOpenRateInfo }: ConverterToolbarProps) {
   const { theme } = useTheme();
   const { t } = useI18n();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
 
   return (
     <View style={styles.toolbar}>

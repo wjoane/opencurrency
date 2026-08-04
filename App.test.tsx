@@ -8,7 +8,6 @@ import { SettingsSheet } from './src/features/settings/SettingsSheet';
 import { type Translate } from './src/i18n';
 import { useI18n } from './src/i18n/I18nContext';
 import { PreferencesProvider, usePreferences } from './src/state/PreferencesContext';
-import { outermostCompositeProps } from './src/testing/compositeProps';
 import { type ThemeContextValue, useTheme } from './src/theme/ThemeContext';
 
 const RESPONSE_BODY = JSON.stringify({
@@ -20,19 +19,6 @@ const originalFetch = globalThis.fetch;
 
 function storeHolding(serialised: string): PreferencesStore {
   return { read: () => Promise.resolve(serialised), write: () => Promise.resolve() };
-}
-
-function renderedLayoutDirection(element: ReturnType<typeof screen.getByText>): string | undefined {
-  const props = outermostCompositeProps<{ readonly style: unknown }>(
-    element,
-    (candidate) =>
-      candidate.style !== undefined &&
-      (StyleSheet.flatten(candidate.style) as { readonly direction?: string }).direction !==
-        undefined,
-    'layout-direction container',
-  );
-
-  return (StyleSheet.flatten(props.style) as { readonly direction?: string }).direction;
 }
 
 beforeEach(() => {
@@ -68,7 +54,7 @@ describe('App', () => {
 
     await screen.findByText('Rates from 2026-07-27');
 
-    expect(screen.getByText('$\u00a01.08')).toBeOnTheScreen();
+    expect(screen.getByText('$1.08')).toBeOnTheScreen();
     expect(screen.getByText('1 EUR = 1.0842 USD')).toBeOnTheScreen();
   });
 
@@ -170,6 +156,18 @@ describe('layout direction at startup', () => {
     await screen.findByText('ready');
   }
 
+  function mirroredDirection(element: ReturnType<typeof screen.getByText>) {
+    for (let node: typeof element | null = element; node; node = node.parent) {
+      const { direction } = StyleSheet.flatten(node.props.style) ?? {};
+
+      if (direction) {
+        return direction;
+      }
+    }
+
+    return undefined;
+  }
+
   it('mirrors for a persisted right-to-left language without requiring a restart', async () => {
     const allowRTL = jest.spyOn(I18nManager, 'allowRTL').mockImplementation(() => {});
     const forceRTL = jest.spyOn(I18nManager, 'forceRTL').mockImplementation(() => {});
@@ -178,18 +176,13 @@ describe('layout direction at startup', () => {
 
     expect(allowRTL).toHaveBeenCalledWith(true);
     expect(forceRTL).toHaveBeenCalledWith(true);
+    expect(mirroredDirection(screen.getByText('ready'))).toBe('rtl');
 
     allowRTL.mockRestore();
     forceRTL.mockRestore();
   });
 
-  it('applies Arabic direction to the rendered application tree', async () => {
-    await mountWithLanguage('ar');
-
-    expect(renderedLayoutDirection(screen.getByText('ready'))).toBe('rtl');
-  });
-
-  it('changes the rendered direction both ways without remounting', async () => {
+  it('changes the selected language both ways without remounting', async () => {
     await render(
       <SafeAreaProvider initialMetrics={initialWindowMetrics}>
         <PreferencesProvider store={storeHolding(JSON.stringify({ language: 'en' }))}>
@@ -202,18 +195,23 @@ describe('layout direction at startup', () => {
 
     const englishHeading = await screen.findByRole('header', { name: 'Settings' });
 
-    expect(renderedLayoutDirection(englishHeading)).toBe('ltr');
+    expect(englishHeading).toBeOnTheScreen();
+    expect(mirroredDirection(englishHeading)).toBe('ltr');
 
     await fireEvent.press(screen.getByRole('combobox', { name: 'Language' }));
     await fireEvent.press(screen.getByRole('radio', { name: 'العربية' }));
 
     const arabicHeading = screen.getByRole('header', { name: 'الإعدادات' });
 
-    expect(renderedLayoutDirection(arabicHeading)).toBe('rtl');
+    expect(arabicHeading).toBeOnTheScreen();
+    expect(mirroredDirection(arabicHeading)).toBe('rtl');
 
     await fireEvent.press(screen.getByRole('combobox', { name: 'اللغة' }));
     await fireEvent.press(screen.getByRole('radio', { name: 'English' }));
 
-    expect(renderedLayoutDirection(screen.getByRole('header', { name: 'Settings' }))).toBe('ltr');
+    const restoredHeading = screen.getByRole('header', { name: 'Settings' });
+
+    expect(restoredHeading).toBeOnTheScreen();
+    expect(mirroredDirection(restoredHeading)).toBe('ltr');
   });
 });

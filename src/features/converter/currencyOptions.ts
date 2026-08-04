@@ -1,15 +1,15 @@
 /** Builds the localized options shown by the currency picker. */
 
 import { type RateTable } from '../../domain/conversion';
+import { isOfferedCurrency } from '../../domain/appData';
+import { normaliseCurrencyCode } from '../../domain/currencyCode';
 import { getCurrencyName, listSeededCurrencyCodes } from '../../domain/currencyCatalogue';
 import { getCountryCode, getSymbol } from '../../domain/currencyMetadata';
-import { isOfferedCurrency } from '../../domain/currencyUniverse';
 
 export interface CurrencyOption {
   readonly currencyCode: string;
   readonly currencyName: string;
   readonly countryCode: string | null;
-
   readonly badgeLabel: string;
 }
 
@@ -22,14 +22,10 @@ export interface CurrencyOptionsInput {
   readonly locale: string;
 }
 
-function normaliseCode(currencyCode: string): string {
-  return currencyCode.trim().toLowerCase();
-}
-
 export function buildCurrencyOptions({ rates, locale }: CurrencyOptionsInput): CurrencyOption[] {
   const codes = new Set(
     [...listSeededCurrencyCodes(), ...Object.keys(rates)]
-      .map(normaliseCode)
+      .map(normaliseCurrencyCode)
       .filter(isOfferedCurrency),
   );
 
@@ -47,7 +43,7 @@ export function filterCurrencyOptions(
   selectedCurrencyCodes: readonly string[],
 ): SelectableCurrencyOption[] {
   const needle = query.trim().toLowerCase();
-  const selected = new Set(selectedCurrencyCodes.map(normaliseCode));
+  const selected = new Set(selectedCurrencyCodes.map(normaliseCurrencyCode));
 
   const matches =
     needle === ''

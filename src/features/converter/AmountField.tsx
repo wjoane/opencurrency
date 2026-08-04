@@ -4,12 +4,10 @@ import { StyleSheet, type StyleProp, type TextStyle, TextInput } from 'react-nat
 
 export interface AmountFieldProps {
   readonly value: string;
-
   readonly placeholder?: string;
   readonly placeholderTextColor?: string;
   readonly onChangeText: (value: string) => void;
   readonly onEndEditing?: () => void;
-
   readonly accessibilityLabel: string;
   readonly style: StyleProp<TextStyle>;
 }
@@ -31,11 +29,9 @@ export function AmountField({
       onChangeText={onChangeText}
       onEndEditing={onEndEditing}
       accessibilityLabel={accessibilityLabel}
-
       keyboardType="decimal-pad"
       inputMode="decimal"
       autoCorrect={false}
-
       autoFocus
       style={[styles.field, style]}
     />

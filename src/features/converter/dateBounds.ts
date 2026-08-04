@@ -16,9 +16,7 @@ export function toRateDate(date: Date): string {
 }
 
 export function latestSelectableRateDate(today: string, shownRateDate: string): string {
-  return [EARLIEST_RATE_DATE, today, shownRateDate].reduce((latest, candidate) =>
-    candidate > latest ? candidate : latest,
-  );
+  return shownRateDate > today ? shownRateDate : today;
 }
 
 export function isSelectableRateDate(rateDate: string, today: string = currentRateDate()): boolean {

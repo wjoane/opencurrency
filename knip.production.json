@@ -1,0 +1,10 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": ["App.tsx"],
+  "project": ["**/*.{ts,tsx}", "!**/*.test.{ts,tsx}", "!src/testing/**"],
+  "ignoreDependencies": ["expo-system-ui"],
+  "jest": false,
+  "babel": {
+    "config": ["babel.config.js"]
+  }
+}

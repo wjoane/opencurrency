@@ -8,15 +8,13 @@ import { createTranslator, FALLBACK_LOCALE, resolveLocale, type Translate } from
 export interface I18nContextValue {
   readonly locale: string;
   readonly t: Translate;
-
   readonly followsDevice: boolean;
-
   readonly setLocale: (locale: string | null) => string;
 }
 
 const I18nContext = createContext<I18nContextValue | null>(null);
 
-export function detectDeviceLocale(): string {
+function detectDeviceLocale(): string {
   try {
     return resolveLocale(getLocales().map((locale) => locale.languageTag));
   } catch {
@@ -30,9 +28,7 @@ export function resolveInitialLocale(initialLocale?: string): string {
 
 export interface I18nProviderProps {
   readonly children: ReactNode;
-
   readonly initialLocale?: string;
-
   readonly onLocaleChange?: (locale: string | null) => void;
 }
 

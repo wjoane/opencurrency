@@ -1,13 +1,13 @@
 /** Composes the converter header, list, toolbar, and date controls. */
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { usePreferences } from '../../state/PreferencesContext';
 import { useRates } from '../../state/RatesContext';
-import { useTheme } from '../../theme/ThemeContext';
 import { type ThemeTokens } from '../../theme/tokens';
+import { useThemedStyles } from '../../theme/useThemedStyles';
 
 import { SettingsSheet } from '../settings/SettingsSheet';
 
@@ -18,15 +18,12 @@ import { CurrencyList } from './CurrencyList';
 import { RateHeader } from './RateHeader';
 import { RateInfoDialog } from './RateInfoDialog';
 
-const NO_RATES = {};
-
 type OpenSurface = 'none' | 'addCurrency' | 'settings' | 'rateInfo';
 
 export function ConverterScreen() {
-  const { theme } = useTheme();
   const { preferences, updatePreferences } = usePreferences();
   const { snapshot } = useRates();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
   const [openSurface, setOpenSurface] = useState<OpenSurface>('none');
 
   const { currencyCodes } = preferences;
@@ -45,6 +42,7 @@ export function ConverterScreen() {
       <RateHeader />
       <View style={styles.body}>
         <CurrencyList
+          rates={snapshot.rates}
           footer={
             <View>
               <ConverterToolbar
@@ -60,7 +58,7 @@ export function ConverterScreen() {
         visible={openSurface === 'addCurrency'}
         onClose={close}
         currencyCodes={currencyCodes}
-        rates={snapshot?.rates ?? NO_RATES}
+        rates={snapshot.rates}
         onAdd={addCurrency}
       />
       <SettingsSheet visible={openSurface === 'settings'} onClose={close} />

@@ -24,7 +24,6 @@ const PERSIST_DEBOUNCE_MS = 400;
 
 export interface PreferencesContextValue {
   readonly preferences: Preferences;
-
   readonly updatePreferences: (patch: Partial<Preferences>) => void;
 }
 
@@ -32,7 +31,6 @@ const PreferencesContext = createContext<PreferencesContextValue | null>(null);
 
 export interface PreferencesProviderProps {
   readonly children: ReactNode;
-
   readonly store?: PreferencesStore;
 }
 
@@ -54,8 +52,11 @@ export function PreferencesProvider({ children, store }: PreferencesProviderProp
     };
   }, [resolvedStore]);
 
-  const persisted = useRef<string | null>(null);
-  const unwritten = useRef<string | null>(null);
+  const persistence = useRef({
+    hydrated: false,
+    lastWritten: null as string | null,
+    pending: null as string | null,
+  });
 
   useEffect(() => {
     if (preferences === null) {
@@ -64,21 +65,22 @@ export function PreferencesProvider({ children, store }: PreferencesProviderProp
 
     const serialised = serialisePreferences(preferences);
 
-    if (persisted.current === null) {
-      persisted.current = serialised;
+    if (!persistence.current.hydrated) {
+      persistence.current.hydrated = true;
+      persistence.current.lastWritten = serialised;
 
       return;
     }
 
-    if (persisted.current === serialised) {
+    if (persistence.current.lastWritten === serialised) {
       return;
     }
 
-    persisted.current = serialised;
-    unwritten.current = serialised;
+    persistence.current.lastWritten = serialised;
+    persistence.current.pending = serialised;
 
     const timer = setTimeout(() => {
-      unwritten.current = null;
+      persistence.current.pending = null;
       void resolvedStore.write(serialised);
     }, PERSIST_DEBOUNCE_MS);
 
@@ -87,8 +89,8 @@ export function PreferencesProvider({ children, store }: PreferencesProviderProp
 
   useEffect(
     () => () => {
-      if (unwritten.current !== null) {
-        void resolvedStore.write(unwritten.current);
+      if (persistence.current.pending !== null) {
+        void resolvedStore.write(persistence.current.pending);
       }
     },
     [resolvedStore],

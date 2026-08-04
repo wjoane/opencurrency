@@ -4,7 +4,6 @@ export type LayoutDirection = 'ltr' | 'rtl';
 
 interface LocaleDescriptor {
   readonly tag: string;
-
   readonly endonym: string;
   readonly direction: LayoutDirection;
 }

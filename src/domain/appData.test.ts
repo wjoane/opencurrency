@@ -1,4 +1,8 @@
-import { BUNDLED_RATES_DOCUMENT, CURRENCIES, CURRENCY_SEED } from './appData';
+import appData from '../../assets/app-data.json';
+
+import { BUNDLED_RATES_DOCUMENT, CURRENCY_SEED } from './appData';
+
+const CURRENCIES = appData.currencies;
 
 describe('the bundled app data', () => {
   it('ships currency names, metadata and the dated rate snapshot together', () => {

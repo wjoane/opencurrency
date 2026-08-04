@@ -108,4 +108,9 @@ describe.each(EXPECTED_TAGS)('the %s catalogue', (locale) => {
       expect(catalogue[key].trim()).not.toBe('');
     }
   });
+
+  it('keeps external destinations out of translated link labels', () => {
+    expect(catalogue['settings.about.github']).not.toContain('https://');
+    expect(catalogue['settings.about.buymeacoffee']).not.toContain('https://');
+  });
 });

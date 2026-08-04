@@ -22,7 +22,9 @@ export function createPreferencesStore(): PreferencesStore {
     async write(serialised) {
       try {
         await AsyncStorage.setItem(PREFERENCES_KEY, serialised);
-      } catch {}
+      } catch {
+        // Preferences persistence is best-effort; the in-memory selection remains usable.
+      }
     },
   };
 }

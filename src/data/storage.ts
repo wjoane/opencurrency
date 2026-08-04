@@ -12,10 +12,8 @@ const MAX_SNAPSHOTS = 180;
 export interface SnapshotStore {
   /** Reads a snapshot for a date, or returns `null`. */
   readonly read: (date: string) => Promise<RateSnapshot | null>;
-
   /** Reads the newest cached snapshot, or returns `null`. */
   readonly readNewest: () => Promise<RateSnapshot | null>;
-
   /** Writes a snapshot and evicts old entries when necessary. */
   readonly write: (snapshot: RateSnapshot) => Promise<void>;
 }
@@ -49,14 +47,6 @@ async function readIndex(): Promise<string[]> {
 
 async function writeIndex(dates: readonly string[]): Promise<void> {
   await AsyncStorage.setItem(INDEX_KEY, JSON.stringify(dates));
-}
-
-async function touch(dates: readonly string[], date: string): Promise<void> {
-  if (dates[0] === date) {
-    return;
-  }
-
-  await writeIndex([date, ...dates.filter((entry) => entry !== date)]);
 }
 
 function evictOverflow(dates: readonly string[]): { kept: string[]; evicted: string[] } {
@@ -100,8 +90,6 @@ export function createSnapshotStore(): SnapshotStore {
 
       return null;
     }
-
-    await touch(dates, date);
 
     return snapshot;
   }
@@ -154,7 +142,9 @@ export function createSnapshotStore(): SnapshotStore {
         }
 
         await writeIndex(kept);
-      } catch {}
+      } catch {
+        // Rate caching is best-effort; reads and network fallback keep the app usable.
+      }
     },
   };
 }

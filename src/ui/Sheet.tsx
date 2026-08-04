@@ -1,32 +1,28 @@
 /** Renders a modal bottom sheet with a scrim and close control. */
 
-import { type ReactNode, useMemo } from 'react';
+import { type ReactNode } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { type ThemeTokens } from '../theme/tokens';
 import { useTheme } from '../theme/ThemeContext';
+import { useThemedStyles } from '../theme/useThemedStyles';
 
 import { CloseIcon } from './icons';
 
 const CLOSE_ICON_SIZE = 22;
 
-export const SHEET_SCRIM_TEST_ID = 'sheet-scrim';
-
 export interface SheetProps {
   /** Whether the sheet is visible. */
   readonly visible: boolean;
-
   readonly onClose: () => void;
-
   readonly title: string;
-
   readonly closeLabel: string;
   readonly children: ReactNode;
 }
 
 export function Sheet({ visible, onClose, title, closeLabel, children }: SheetProps) {
   const { theme } = useTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
 
   return (
     <Modal
@@ -36,9 +32,7 @@ export function Sheet({ visible, onClose, title, closeLabel, children }: SheetPr
       onRequestClose={onClose}
       accessibilityViewIsModal
     >
-      {}
       <Pressable
-        testID={SHEET_SCRIM_TEST_ID}
         style={styles.scrim}
         onPress={onClose}
         accessibilityElementsHidden

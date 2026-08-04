@@ -1,5 +1,8 @@
+import appData from '../../assets/app-data.json';
+
 import { getCountryCode, getMinorUnits, getSymbol } from './currencyMetadata';
-import { CURRENCIES } from './appData';
+
+const CURRENCIES = appData.currencies;
 
 describe('getMinorUnits', () => {
   it('returns the ISO-4217 minor unit', () => {

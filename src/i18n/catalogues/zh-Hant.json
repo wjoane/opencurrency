@@ -43,11 +43,11 @@
   "settings.language": "語言",
   "settings.language.system": "跟隨裝置",
   "settings.about": "關於",
-  "settings.about.open": "關於 OpenCurrency",
+  "settings.about.open": "關於 OpenCurrency",
   "settings.about.tagline": "簡單的換算器，僅此而已。",
   "settings.about.description": "OpenCurrency 是輕量的開源貨幣換算工具，使用公開的每日參考匯率。\n沒有帳號、沒有廣告、沒有追蹤。",
   "settings.about.credits": "旗幟圖示由 Copyright (c) 2026 HatScripts 依 MIT 授權條款提供。\n匯率由 @fawazahmed0 的開放 currency-api 免費提供。",
   "settings.about.licence": "依 GNU General Public License v3 發布。",
-  "settings.about.github": "您可以在 GitHub 上為此專案做出貢獻：\nhttps://github.com/wjoane/opencurrency",
-  "settings.about.buymeacoffee": "如果您喜歡此應用程式，可以請我喝杯咖啡：\nhttps://buymeacoffee.com/wjoane"
+  "settings.about.github": "您可以在 GitHub 上為此專案做出貢獻：",
+  "settings.about.buymeacoffee": "如果您喜歡此應用程式，可以請我喝杯咖啡："
 }

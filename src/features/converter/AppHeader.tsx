@@ -1,11 +1,11 @@
 /** Renders the application title and settings action. */
 
-import { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useI18n } from '../../i18n/I18nContext';
 import { useTheme } from '../../theme/ThemeContext';
 import { type ThemeTokens } from '../../theme/tokens';
+import { useThemedStyles } from '../../theme/useThemedStyles';
 import { BrandMark } from '../../ui/BrandMark';
 import { SettingsIcon } from '../../ui/icons';
 
@@ -26,7 +26,7 @@ export interface AppHeaderProps {
 export function AppHeader({ onOpenSettings }: AppHeaderProps) {
   const { theme } = useTheme();
   const { t } = useI18n();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
 
   return (
     <View style={styles.header}>

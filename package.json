@@ -50,7 +50,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format:check": "prettier --check .",
-    "knip:check": "knip",
+    "knip:check": "knip && knip -c knip.production.json --exports",
     "test:coverage": "jest --coverage"
   },
   "private": true

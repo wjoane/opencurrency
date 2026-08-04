@@ -27,12 +27,13 @@ const REQUEST_TIMEOUT_MS = 10_000;
 
 const HTTP_NOT_FOUND = 404;
 
-const MAX_RESPONSE_BYTES = 1_048_576;
+const MAX_DECLARED_RESPONSE_BYTES = 1_048_576;
+const MAX_BUFFERED_RESPONSE_CODE_UNITS = 1_048_576;
 
 function declaresOversizedBody(response: Response): boolean {
   const declared = Number(response.headers.get('content-length'));
 
-  return Number.isFinite(declared) && declared > MAX_RESPONSE_BYTES;
+  return Number.isFinite(declared) && declared > MAX_DECLARED_RESPONSE_BYTES;
 }
 
 type UrlBuilder = (dateSpec: string) => string;
@@ -69,7 +70,9 @@ async function fetchFromHost(url: string): Promise<RateFetchResult> {
 
     const body = await response.text();
 
-    if (body.length > MAX_RESPONSE_BYTES) {
+    // React Native fetch does not expose a portable streaming reader. This post-buffer
+    // sanity check measures UTF-16 code units; the header check above is the byte cap.
+    if (body.length > MAX_BUFFERED_RESPONSE_CODE_UNITS) {
       return { ok: false, reason: 'invalid' };
     }
 

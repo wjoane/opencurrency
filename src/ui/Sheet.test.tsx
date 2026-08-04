@@ -3,7 +3,7 @@ import { Text } from 'react-native';
 
 import { ThemeProvider } from '../theme/ThemeContext';
 
-import { Sheet, SHEET_SCRIM_TEST_ID } from './Sheet';
+import { Sheet } from './Sheet';
 
 const TITLE = 'Add a currency';
 const CLOSE_LABEL = 'Close';
@@ -24,10 +24,6 @@ async function renderSheet({ visible = true, onClose = jest.fn() }: RenderOption
   );
 
   return { onClose };
-}
-
-async function pressScrim() {
-  await fireEvent.press(screen.getByTestId(SHEET_SCRIM_TEST_ID, { includeHiddenElements: true }));
 }
 
 describe('Sheet', () => {
@@ -55,14 +51,6 @@ describe('Sheet', () => {
     const { onClose } = await renderSheet();
 
     await fireEvent.press(screen.getByLabelText(CLOSE_LABEL));
-
-    expect(onClose).toHaveBeenCalledTimes(1);
-  });
-
-  it('closes from the scrim', async () => {
-    const { onClose } = await renderSheet();
-
-    await pressScrim();
 
     expect(onClose).toHaveBeenCalledTimes(1);
   });

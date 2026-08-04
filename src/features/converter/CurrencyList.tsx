@@ -17,34 +17,31 @@ import ReorderableList, {
 import { type RateTable } from '../../domain/conversion';
 import { useI18n } from '../../i18n/I18nContext';
 import { type Translate } from '../../i18n';
-import { getLayoutDirection } from '../../i18n/locales';
+import { getLayoutDirection, type LayoutDirection } from '../../i18n/locales';
 import { usePreferences } from '../../state/PreferencesContext';
-import { useRates } from '../../state/RatesContext';
-import { useTheme } from '../../theme/ThemeContext';
+import { MINIMUM_CURRENCY_ROWS } from '../../state/preferences';
 import { type ThemeTokens } from '../../theme/tokens';
+import { useThemedStyles } from '../../theme/useThemedStyles';
 
 import { CurrencyRow, type CurrencyRowMoveAction } from './CurrencyRow';
 import { REORDER_LONG_PRESS_DURATION } from './interactionConstants';
 import { buildCurrencyRows, type CurrencyRowModel } from './rowModels';
+import { type SwipeRemovalLifecycle } from './SwipeToDeleteRow';
 
-const NO_RATES: RateTable = {};
-
-const MINIMUM_CURRENCY_ROWS = 2;
 const REORDER_PAN_ACTIVATION_DURATION = REORDER_LONG_PRESS_DURATION + 20;
 
 export interface CurrencyListProps {
   /** Content rendered below the currency rows. */
   readonly footer: ReactElement;
+  readonly rates: RateTable;
 }
 
 /** Renders the converter list. */
-export function CurrencyList({ footer }: CurrencyListProps) {
+export function CurrencyList({ footer, rates }: CurrencyListProps) {
   const { preferences, updatePreferences } = usePreferences();
-  const { snapshot } = useRates();
   const { locale, t } = useI18n();
-  const { theme } = useTheme();
   const { activeCurrencyCode, currencyCodes } = preferences;
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
   const reorderPanGesture = useMemo(
     () => Gesture.Pan().activateAfterLongPress(REORDER_PAN_ACTIVATION_DURATION),
     [],
@@ -53,43 +50,46 @@ export function CurrencyList({ footer }: CurrencyListProps) {
   const [formatActiveAmount, setFormatActiveAmount] = useState(true);
 
   const rows = useMemo(
-    () => [
-      ...buildCurrencyRows({
+    () =>
+      buildCurrencyRows({
         currencyCodes,
         activeCurrencyCode,
         amountText: preferences.amountText,
         formatActiveAmount,
-        rates: snapshot?.rates ?? NO_RATES,
+        rates,
         locale,
         t,
       }),
-    ],
     [
       currencyCodes,
       activeCurrencyCode,
       preferences.amountText,
       formatActiveAmount,
-      snapshot,
+      rates,
       locale,
       t,
     ],
   );
   const rowsRef = useRef(rows);
+  const selectionRef = useRef({ activeCurrencyCode, currencyCodes });
+  const pendingRemovalCodesRef = useRef(new Set<string>());
 
   useEffect(() => {
     rowsRef.current = rows;
-  }, [rows]);
+    selectionRef.current = { activeCurrencyCode, currencyCodes };
+  }, [activeCurrencyCode, currencyCodes, rows]);
 
   const activate = useCallback(
     (currencyCode: string, editableAmountText: string) => {
-      if (currencyCode === activeCurrencyCode) {
+      if (currencyCode === selectionRef.current.activeCurrencyCode) {
         return;
       }
 
+      selectionRef.current = { ...selectionRef.current, activeCurrencyCode: currencyCode };
       setFormatActiveAmount(true);
       updatePreferences({ activeCurrencyCode: currencyCode, amountText: editableAmountText });
     },
-    [activeCurrencyCode, updatePreferences],
+    [updatePreferences],
   );
 
   const changeAmount = useCallback(
@@ -102,11 +102,34 @@ export function CurrencyList({ footer }: CurrencyListProps) {
 
   const finishAmountEditing = useCallback(() => setFormatActiveAmount(true), []);
 
+  const startRemove = useCallback((currencyCode: string) => {
+    const pendingRemovalCodes = pendingRemovalCodesRef.current;
+    const remainingCurrencyCodes = selectionRef.current.currencyCodes.filter(
+      (code) => code !== currencyCode && !pendingRemovalCodes.has(code),
+    );
+
+    if (
+      pendingRemovalCodes.has(currencyCode) ||
+      remainingCurrencyCodes.length < MINIMUM_CURRENCY_ROWS
+    ) {
+      return false;
+    }
+
+    pendingRemovalCodes.add(currencyCode);
+    return true;
+  }, []);
+
   const remove = useCallback(
     (currencyCode: string) => {
-      const remainingCurrencyCodes = currencyCodes.filter((code) => code !== currencyCode);
+      const { activeCurrencyCode: currentActiveCurrencyCode, currencyCodes: currentCurrencyCodes } =
+        selectionRef.current;
+      const remainingCurrencyCodes = currentCurrencyCodes.filter((code) => code !== currencyCode);
 
-      if (currencyCode !== activeCurrencyCode) {
+      if (currencyCode !== currentActiveCurrencyCode) {
+        selectionRef.current = {
+          activeCurrencyCode: currentActiveCurrencyCode,
+          currencyCodes: remainingCurrencyCodes,
+        };
         updatePreferences({ currencyCodes: remainingCurrencyCodes });
 
         return;
@@ -117,24 +140,45 @@ export function CurrencyList({ footer }: CurrencyListProps) {
         (row) => row.currencyCode === newActiveCurrencyCode,
       );
 
+      selectionRef.current = {
+        activeCurrencyCode: newActiveCurrencyCode,
+        currencyCodes: remainingCurrencyCodes,
+      };
       updatePreferences({
         currencyCodes: remainingCurrencyCodes,
         activeCurrencyCode: newActiveCurrencyCode,
         amountText: newActiveRow?.editableAmountText ?? '',
       });
     },
-    [activeCurrencyCode, currencyCodes, updatePreferences],
+    [updatePreferences],
+  );
+
+  const finishRemove = useCallback(
+    (currencyCode: string, completed: boolean) => {
+      pendingRemovalCodesRef.current.delete(currencyCode);
+
+      if (completed) {
+        remove(currencyCode);
+      }
+    },
+    [remove],
+  );
+  const removalLifecycle = useMemo<CurrencyRemovalLifecycle>(
+    () => ({ start: startRemove, finish: finishRemove }),
+    [finishRemove, startRemove],
   );
 
   const moveCurrency = useCallback(
     ({ from, to }: ReorderableListReorderEvent) => {
-      if (!isValidReorder({ from, to }, currencyCodes.length)) {
-        return;
-      }
-
-      updatePreferences({ currencyCodes: reorderItems([...currencyCodes], from, to) });
+      const reorderedCurrencyCodes = reorderItems(
+        [...selectionRef.current.currencyCodes],
+        from,
+        to,
+      );
+      selectionRef.current = { ...selectionRef.current, currencyCodes: reorderedCurrencyCodes };
+      updatePreferences({ currencyCodes: reorderedCurrencyCodes });
     },
-    [currencyCodes, updatePreferences],
+    [updatePreferences],
   );
 
   const canRemove = currencyCodes.length > MINIMUM_CURRENCY_ROWS;
@@ -149,7 +193,7 @@ export function CurrencyList({ footer }: CurrencyListProps) {
         onActivate={activate}
         onAmountChange={changeAmount}
         onAmountEditingEnd={finishAmountEditing}
-        onRemove={remove}
+        removalLifecycle={removalLifecycle}
         onMove={moveCurrency}
         layoutDirection={getLayoutDirection(locale)}
         t={t}
@@ -161,7 +205,7 @@ export function CurrencyList({ footer }: CurrencyListProps) {
       activate,
       changeAmount,
       finishAmountEditing,
-      remove,
+      removalLifecycle,
       moveCurrency,
       locale,
       t,
@@ -177,7 +221,6 @@ export function CurrencyList({ footer }: CurrencyListProps) {
       onReorder={moveCurrency}
       panGesture={reorderPanGesture}
       accessibilityLabel={t('converter.listLabel')}
-
       keyboardShouldPersistTaps="handled"
       style={styles.list}
       contentContainerStyle={styles.content}
@@ -193,10 +236,15 @@ interface CurrencyListRowProps {
   readonly onActivate: (currencyCode: string, editableAmountText: string) => void;
   readonly onAmountChange: (value: string) => void;
   readonly onAmountEditingEnd: () => void;
-  readonly onRemove: (currencyCode: string) => void;
+  readonly removalLifecycle: CurrencyRemovalLifecycle;
   readonly onMove: (event: ReorderableListReorderEvent) => void;
-  readonly layoutDirection: 'ltr' | 'rtl';
+  readonly layoutDirection: LayoutDirection;
   readonly t: Translate;
+}
+
+interface CurrencyRemovalLifecycle {
+  readonly start: (currencyCode: string) => boolean;
+  readonly finish: (currencyCode: string, completed: boolean) => void;
 }
 
 function CurrencyListRow({
@@ -207,7 +255,7 @@ function CurrencyListRow({
   onActivate,
   onAmountChange,
   onAmountEditingEnd,
-  onRemove,
+  removalLifecycle,
   onMove,
   layoutDirection,
   t,
@@ -229,6 +277,13 @@ function CurrencyListRow({
         : null,
     [index, moveDown, row.currencyName, rowCount, t],
   );
+  const removal = useMemo<SwipeRemovalLifecycle>(
+    () => ({
+      start: () => removalLifecycle.start(row.currencyCode),
+      finish: (completed) => removalLifecycle.finish(row.currencyCode, completed),
+    }),
+    [removalLifecycle, row.currencyCode],
+  );
 
   return (
     <CurrencyRow
@@ -247,7 +302,7 @@ function CurrencyListRow({
       onAmountChange={onAmountChange}
       onAmountEditingEnd={onAmountEditingEnd}
       canRemove={canRemove}
-      onRemove={onRemove}
+      removal={removal}
       removeLabel={t('converter.removeLabel', { currency: row.currencyName })}
       onReorderLongPress={drag}
       moveUpAction={moveUpAction}
@@ -257,19 +312,8 @@ function CurrencyListRow({
   );
 }
 
-function keyExtractor(row: CurrencyRowModel | undefined, index: number): string {
-  return row?.currencyCode ?? String(index);
-}
-
-function isValidReorder({ from, to }: ReorderableListReorderEvent, itemCount: number): boolean {
-  return (
-    Number.isInteger(from) &&
-    Number.isInteger(to) &&
-    from >= 0 &&
-    to >= 0 &&
-    from < itemCount &&
-    to < itemCount
-  );
+function keyExtractor(row: CurrencyRowModel): string {
+  return row.currencyCode;
 }
 
 function createStyles(theme: ThemeTokens) {

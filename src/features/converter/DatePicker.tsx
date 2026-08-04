@@ -8,9 +8,7 @@ import { clampRateDate, EARLIEST_RATE_DATE, toRateDate, toUtcDate } from './date
 
 export interface DatePickerProps {
   readonly value: string;
-
   readonly maximumDate: string;
-
   readonly onChange: (rateDate: string) => void;
   readonly onDismiss: () => void;
   readonly accessibilityLabel: string;
@@ -38,7 +36,6 @@ export function DatePicker({
       onDismiss={onDismiss}
       onNeutralButtonPress={onDismiss}
       accessibilityLabel={accessibilityLabel}
-
       timeZoneName="UTC"
     />
   );

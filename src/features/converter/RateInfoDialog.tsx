@@ -1,11 +1,10 @@
 /** Explains the source and meaning of the displayed rates. */
 
-import { useMemo } from 'react';
 import { StyleSheet, Text } from 'react-native';
 
 import { useI18n } from '../../i18n/I18nContext';
-import { useTheme } from '../../theme/ThemeContext';
 import { type ThemeTokens } from '../../theme/tokens';
+import { useThemedStyles } from '../../theme/useThemedStyles';
 import { InfoDialog } from '../../ui/InfoDialog';
 
 export interface RateInfoDialogProps {
@@ -14,9 +13,8 @@ export interface RateInfoDialogProps {
 }
 
 export function RateInfoDialog({ visible, onClose }: RateInfoDialogProps) {
-  const { theme } = useTheme();
   const { t } = useI18n();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const styles = useThemedStyles(createStyles);
 
   return (
     <InfoDialog

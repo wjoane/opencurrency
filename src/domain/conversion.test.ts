@@ -1,5 +1,5 @@
 import { convertAmount, type RateTable } from './conversion';
-import { fromNumber, type MoneyAmount, toDecimalString, toFixedDecimalString } from './money';
+import { fromNumber, type MoneyAmount, toFixedDecimalString } from './money';
 
 const RATES: RateTable = {
   eur: 1,
@@ -31,7 +31,7 @@ function converted(value: number, from: string, to: string, rates: RateTable = R
 
 describe('convertAmount', () => {
   it('converts from the reference currency', () => {
-    expect(toDecimalString(converted(100, 'eur', 'usd'))).toBe('108.71');
+    expect(converted(100, 'eur', 'usd').toFixed()).toBe('108.71');
   });
 
   it('converts to the reference currency', () => {
@@ -43,22 +43,22 @@ describe('convertAmount', () => {
   });
 
   it('is the identity when the currencies are the same', () => {
-    expect(toDecimalString(converted(13.49480249, 'usd', 'usd'))).toBe('13.49480249');
-    expect(toDecimalString(converted(13.49480249, 'eur', 'eur'))).toBe('13.49480249');
+    expect(converted(13.49480249, 'usd', 'usd').toFixed()).toBe('13.49480249');
+    expect(converted(13.49480249, 'eur', 'eur').toFixed()).toBe('13.49480249');
   });
 
   it('needs no rate at all to convert a currency to itself', () => {
-    expect(toDecimalString(converted(5, 'xyz', 'xyz', {}))).toBe('5');
+    expect(converted(5, 'xyz', 'xyz', {}).toFixed()).toBe('5');
   });
 
   it('leaves the amount unchanged when both rates are exactly 1', () => {
-    expect(toDecimalString(converted(42.5, 'eur', 'par', { eur: 1, par: 1 }))).toBe('42.5');
+    expect(converted(42.5, 'eur', 'par', { eur: 1, par: 1 }).toFixed()).toBe('42.5');
   });
 
   it('treats the reference currency as 1 when the table omits it', () => {
     const withoutReference: RateTable = { usd: 1.0871 };
 
-    expect(toDecimalString(converted(100, 'eur', 'usd', withoutReference))).toBe('108.71');
+    expect(converted(100, 'eur', 'usd', withoutReference).toFixed()).toBe('108.71');
   });
 
   it('round-trips a value back through the reference currency', () => {
@@ -72,11 +72,11 @@ describe('convertAmount', () => {
   it('keeps the precision of a rate with many digits', () => {
     const inBitcoin = converted(1, 'eur', 'btc');
 
-    expect(toDecimalString(inBitcoin)).toBe('0.000011539');
+    expect(inBitcoin.toFixed()).toBe('0.000011539');
   });
 
   it('ignores the case and padding of currency codes', () => {
-    expect(toDecimalString(converted(100, ' EUR ', 'USD'))).toBe('108.71');
+    expect(converted(100, ' EUR ', 'USD').toFixed()).toBe('108.71');
   });
 
   it('returns null when a rate is missing', () => {

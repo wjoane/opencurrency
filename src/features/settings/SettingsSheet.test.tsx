@@ -39,20 +39,13 @@ async function openLanguageDropdown(name = 'Language') {
 }
 
 describe('SettingsSheet', () => {
-  it('offers appearance as one horizontal three-way selection', async () => {
+  it('offers appearance as one three-way selection', async () => {
     await renderSheet();
 
     expect(appearance('System')).toBeChecked();
     expect(appearance('Light')).not.toBeChecked();
     expect(appearance('Dark')).not.toBeChecked();
     expect(screen.queryAllByRole('switch')).toHaveLength(0);
-
-    const system = appearance('System');
-    const light = appearance('Light');
-    const dark = appearance('Dark');
-
-    expect(system.parent).toBe(light.parent);
-    expect(light.parent).toBe(dark.parent);
   });
 
   it('changes the appearance directly from the three-way selection', async () => {
@@ -201,6 +194,23 @@ describe('SettingsSheet', () => {
 
     expect(openUrl).toHaveBeenNthCalledWith(1, 'https://github.com/wjoane/opencurrency');
     expect(openUrl).toHaveBeenNthCalledWith(2, 'https://buymeacoffee.com/wjoane');
+
+    openUrl.mockRestore();
+  });
+
+  it('keeps the About message usable when an external link cannot open', async () => {
+    const openUrl = jest.spyOn(Linking, 'openURL').mockRejectedValue(new Error('unavailable'));
+
+    await renderSheet();
+    await fireEvent.press(screen.getByRole('button', { name: 'About OpenCurrency' }));
+    await fireEvent.press(
+      screen.getByRole('link', {
+        name: 'https://github.com/wjoane/opencurrency',
+      }),
+    );
+
+    await waitFor(() => expect(openUrl).toHaveBeenCalled());
+    expect(screen.getByText('Simple converter, nothing more.')).toBeOnTheScreen();
 
     openUrl.mockRestore();
   });

@@ -1,5 +1,6 @@
 DC := $(shell docker compose version >/dev/null 2>&1 && echo "docker compose" || echo "docker-compose")
-RUN  := $(DC) run --rm app
+RUN := $(DC) run --rm app
+HOUSEKEEP := $(DC) run --rm --entrypoint sh app -c
 
 EAS  := npx --yes eas-cli@21.3.0
 
@@ -24,6 +25,14 @@ up: ## Start the Expo dev server (browser + phone, interactive)
 .PHONY: down
 down: ## Stop and remove containers
 	$(DC) down
+
+.PHONY: clear
+clear: ## Start the dev server with a cleared Metro cache
+	$(RUN) npx expo start --clear
+
+.PHONY: tunnel
+tunnel: ## Start the dev server over Expo's tunnel (works off-LAN, slower)
+	$(RUN) npx expo start --tunnel
 
 ##@ Quality
 
@@ -83,3 +92,15 @@ build-android-preview: ## Cloud-build an installable Android APK (preview profil
 .PHONY: build-android
 build-android: ## Cloud-build a Play Store Android AAB (production profile)
 	$(RUN) $(EAS) build --platform android --profile production
+
+##@ Housekeeping
+
+.PHONY: clean
+clean: ## Remove containers and build output (keeps caches and EAS login)
+	$(HOUSEKEEP) 'rm -rf /workspace/dist /workspace/web-build /workspace/.expo'
+	$(DC) down --remove-orphans
+
+.PHONY: reset
+reset: ## Full wipe: containers, volumes, caches, EAS login and node_modules
+	$(HOUSEKEEP) 'rm -rf /workspace/dist /workspace/web-build /workspace/.expo /workspace/node_modules'
+	$(DC) down --volumes --remove-orphans

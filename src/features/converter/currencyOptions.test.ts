@@ -67,6 +67,15 @@ describe('buildCurrencyOptions', () => {
     expect(codes.filter((code) => code === 'jpy')).toHaveLength(1);
   });
 
+  it('normalises provider keys before emitting and deduplicating them', () => {
+    const codes = codesOf(
+      buildCurrencyOptions({ rates: { JPY: 165 } as unknown as RateTable, locale: 'en' }),
+    );
+
+    expect(codes.filter((code) => code === 'jpy')).toHaveLength(1);
+    expect(codes).not.toContain('JPY');
+  });
+
   it('orders by code, so the list does not reshuffle when the language changes', () => {
     const english = codesOf(buildCurrencyOptions({ rates: NO_RATES, locale: 'en' }));
     const german = codesOf(buildCurrencyOptions({ rates: NO_RATES, locale: 'de' }));

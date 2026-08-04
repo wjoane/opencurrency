@@ -13,6 +13,7 @@ import { getLayoutDirection } from './src/i18n/locales';
 import { PreferencesProvider, usePreferences } from './src/state/PreferencesContext';
 import { RatesProvider } from './src/state/RatesContext';
 import { type ThemePreference, ThemeProvider, useTheme } from './src/theme/ThemeContext';
+import { getDirectionProps, getDirectionStyle } from './src/ui/layoutDirection';
 
 /** Renders the status bar using the resolved theme. */
 function ThemedStatusBar() {
@@ -24,9 +25,15 @@ function ThemedStatusBar() {
 /** Applies the selected locale's direction live to the mounted application tree. */
 function LayoutDirectionContainer({ children }: { readonly children: ReactNode }) {
   const { locale } = useI18n();
+  const direction = getLayoutDirection(locale);
 
   return (
-    <View style={[styles.direction, { direction: getLayoutDirection(locale) }]}>{children}</View>
+    <View
+      {...getDirectionProps(direction)}
+      style={[styles.direction, getDirectionStyle(direction)]}
+    >
+      {children}
+    </View>
   );
 }
 

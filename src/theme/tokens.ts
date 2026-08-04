@@ -1,28 +1,20 @@
+/** Shared values used to style the interface. */
+
 import { type TextStyle } from 'react-native';
 
 interface ColorTokens {
   readonly background: string;
-
   readonly surface: string;
-
   readonly surfaceRaised: string;
   readonly border: string;
   readonly textPrimary: string;
-
   readonly textSecondary: string;
-
   readonly textMuted: string;
-
   readonly primary: string;
-
   readonly accent: string;
-
   readonly onEmphasis: string;
-
   readonly danger: string;
-
   readonly warning: string;
-
   readonly scrim: string;
 }
 
@@ -37,11 +29,8 @@ interface SpacingTokens {
 
 interface RadiusTokens {
   readonly sm: number;
-
   readonly md: number;
-
   readonly lg: number;
-
   readonly pill: number;
 }
 
@@ -49,18 +38,14 @@ interface TypographyToken {
   readonly fontSize: number;
   readonly lineHeight: number;
   readonly fontWeight: '400' | '500' | '600' | '700';
-
   readonly fontVariant?: TextStyle['fontVariant'];
 }
 
 interface TypographyTokens {
   readonly title: TypographyToken;
   readonly body: TypographyToken;
-
   readonly amount: TypographyToken;
-
   readonly code: TypographyToken;
-
   readonly label: TypographyToken;
   readonly caption: TypographyToken;
 }
@@ -124,4 +109,3 @@ const darkColors: ColorTokens = {
 export const lightTheme: ThemeTokens = { colors: lightColors, spacing, radii, typography };
 
 export const darkTheme: ThemeTokens = { colors: darkColors, spacing, radii, typography };
-/** Shared values used to style the interface. */

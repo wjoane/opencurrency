@@ -23,7 +23,6 @@ export type SnapshotOutcome =
 export interface RateRepository {
   /** Loads the latest available snapshot. */
   readonly loadLatest: () => Promise<SnapshotOutcome>;
-
   /** Loads a snapshot for an explicit date. */
   readonly loadDate: (date: string) => Promise<SnapshotOutcome>;
 }
@@ -31,9 +30,7 @@ export interface RateRepository {
 export interface RateRepositoryOptions {
   readonly store?: SnapshotStore;
   readonly fetchSnapshot?: (dateSpec: string) => Promise<RateFetchResult>;
-
   readonly now?: () => Date;
-
   /** Snapshot used when no persisted rate is available after a failed latest fetch. */
   readonly fallbackSnapshot?: RateSnapshot | null;
 }

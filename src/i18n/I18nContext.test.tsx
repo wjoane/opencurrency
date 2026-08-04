@@ -2,7 +2,7 @@ import { act, render, screen } from '@testing-library/react-native';
 import { getLocales } from 'expo-localization';
 import { Text } from 'react-native';
 
-import { detectDeviceLocale, I18nProvider, useI18n } from './I18nContext';
+import { I18nProvider, useI18n } from './I18nContext';
 
 jest.mock('expo-localization', () => ({ getLocales: jest.fn() }));
 
@@ -37,25 +37,43 @@ beforeEach(() => {
   mockedGetLocales.mockReturnValue(locales('en-US'));
 });
 
-describe('detectDeviceLocale', () => {
-  it('resolves the device preference list in order', () => {
+describe('device locale detection', () => {
+  it('resolves the device preference list in order', async () => {
     mockedGetLocales.mockReturnValue(locales('kl-GL', 'en-GB'));
 
-    expect(detectDeviceLocale()).toBe('en');
+    await render(
+      <I18nProvider>
+        <LocaleReadout />
+      </I18nProvider>,
+    );
+
+    expect(screen.getByText('locale: en')).toBeOnTheScreen();
   });
 
-  it('falls back when the device reports no locale at all', () => {
+  it('falls back when the device reports no locale at all', async () => {
     mockedGetLocales.mockReturnValue(locales());
 
-    expect(detectDeviceLocale()).toBe('en');
+    await render(
+      <I18nProvider>
+        <LocaleReadout />
+      </I18nProvider>,
+    );
+
+    expect(screen.getByText('locale: en')).toBeOnTheScreen();
   });
 
-  it('falls back when reading the OS preference throws', () => {
+  it('falls back when reading the OS preference throws', async () => {
     mockedGetLocales.mockImplementation(() => {
       throw new Error('native module unavailable');
     });
 
-    expect(detectDeviceLocale()).toBe('en');
+    await render(
+      <I18nProvider>
+        <LocaleReadout />
+      </I18nProvider>,
+    );
+
+    expect(screen.getByText('locale: en')).toBeOnTheScreen();
   });
 });
 

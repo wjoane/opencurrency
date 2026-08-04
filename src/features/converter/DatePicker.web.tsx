@@ -14,7 +14,6 @@ export function DatePicker({
 }: DatePickerProps) {
   return (
     <View style={styles.container}>
-      {}
       <input
         type="date"
         value={value}

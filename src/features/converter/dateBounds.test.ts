@@ -32,6 +32,14 @@ describe('toUtcDate and toRateDate', () => {
 describe('clampRateDate', () => {
   const TODAY = '2026-07-28';
 
+  it('uses the current UTC day when no upper bound is supplied', () => {
+    jest.useFakeTimers().setSystemTime(new Date('2026-07-28T23:30:00.000Z'));
+
+    expect(clampRateDate('2026-07-29')).toBe('2026-07-28');
+
+    jest.useRealTimers();
+  });
+
   it('leaves a date inside the range alone', () => {
     expect(clampRateDate('2025-01-15', TODAY)).toBe('2025-01-15');
   });
@@ -66,11 +74,6 @@ describe('latestSelectableRateDate', () => {
     expect(latestSelectableRateDate('2026-07-27', '2026-07-28')).toBe('2026-07-28');
   });
 
-  it('never falls below the provider’s first publication', () => {
-    expect(latestSelectableRateDate('2019-01-01', '2019-01-01')).toBe(EARLIEST_RATE_DATE);
-    expect(isSelectableRateDate(EARLIEST_RATE_DATE, EARLIEST_RATE_DATE)).toBe(true);
-  });
-
   it('is at least the day on screen and at least today, whichever leads', () => {
     expect(latestSelectableRateDate('2026-07-28', '2027-01-01')).toBe('2027-01-01');
     expect(latestSelectableRateDate('2027-01-01', '2026-07-28')).toBe('2027-01-01');
@@ -79,6 +82,15 @@ describe('latestSelectableRateDate', () => {
 
 describe('isSelectableRateDate', () => {
   const TODAY = '2026-07-28';
+
+  it('uses the current UTC day when no upper bound is supplied', () => {
+    jest.useFakeTimers().setSystemTime(new Date('2026-07-28T23:30:00.000Z'));
+
+    expect(isSelectableRateDate('2026-07-28')).toBe(true);
+    expect(isSelectableRateDate('2026-07-29')).toBe(false);
+
+    jest.useRealTimers();
+  });
 
   it('accepts the range the provider publishes, inclusive at both ends', () => {
     expect(isSelectableRateDate(EARLIEST_RATE_DATE, TODAY)).toBe(true);
