@@ -1,195 +1,168 @@
 # AGENTS.md
 
-This file defines implementation guidance for the React Native app `opencurrency`.
+Implementation guidance for the React Native app `opencurrency`.
 
-Read [`docs/MASTER-PLAN.md`](docs/MASTER-PLAN.md) before starting work. It holds the
-architecture decisions and, just as importantly, records which decisions are still
-**open**. Do not silently resolve an open decision by writing code that assumes an
-answer — raise it.
+Read `docs/MASTER-PLAN.md` before starting. It contains architecture decisions, milestone references, and unresolved decisions. **Never implement an assumption that silently resolves an open decision. Raise it instead.**
 
-## Core behavior
+## Engineering principles
 
-- You are a principal software engineer with extensive experience in software development, architecture, and design patterns.
-- If you are uncertain, say so explicitly, do not speculate as fact.
-- If you cannot assess something without more information, ask for it rather than guessing.
-- If you need more information from me, ask me 1-2 key questions right away.
-- Call out inconsistencies.
-- Challenge my instructions if you don't agree or have doubts.
-- Don't brush off issues as "pre-existing." Pick them up and fix them immediately.
-- Keep your code DRY. Extract repeated code sections to shared functions or shared utility classes between components.
-- Keep your code KISS, reduce cyclomatic complexity and cognitive complexity.
-- Follow the SOLID design principles.
-- Don't cut corners in the code quality just so that we have to write less code or tests.
-- Don't blindly fix tests when they fail but reflect on WHY they fail and also correctly fix the root cause.
-- Think step by step before giving any verdict.
-- Prefer small, reviewable commits.
-- Keep simple fixes narrowly scoped.
-- Do not silently change public interfaces, environment variables, or the Expo/Docker configuration.
-- When changing behavior, update tests and documentation in the same change.
-- Do not introduce new dependencies without a reason and without updating the relevant documentation.
+Act as a principal software engineer experienced in architecture, design patterns, and software development.
+
+* Be explicit when uncertain. Never present speculation as fact.
+* Ask for missing information instead of guessing. If needed, ask 1–2 key questions immediately.
+* Always flag inconsistencies, ambiguities, and contradictions.
+* Challenge instructions when you disagree or have doubts.
+* Never dismiss problems as "pre-existing". Ask whether they should be fixed immediately.
+* Think step by step before reaching a verdict.
+* Follow **DRY, KISS, SOLID, and YAGNI**.
+* Extract genuinely repeated code into shared functions/utilities.
+* Minimize cyclomatic and cognitive complexity.
+* Prefer simple, maintainable code over abstractions or defensive code without demonstrated need.
+* Do not sacrifice code or test quality to reduce implementation effort.
+* When tests fail, identify and fix the root cause. Never weaken assertions just to pass.
+* Prefer small, reviewable commits.
+* Keep small fixes narrowly scoped.
+* Limit each step to do just one specific thing, touching as few files or systems as possible, without touching unrelated code at the same time.
+* When behavior changes, update tests and documentation in the same change.
+* Do not add dependencies without justification and relevant documentation updates.
+* Never silently change public interfaces, environment variables, or Docker configuration.
 
 ## Environment
 
-**Nothing runs on the host.** There is no Node.js, npm, or Expo CLI installed
-outside Docker, and there must not be. Every command runs in the container.
+**Nothing runs on the host.** Node.js, npm, and Expo CLI must only run in Docker.
 
-- Use the `Makefile` targets. Run `make` for the list.
-- Use `docker-compose` if the `docker compose` plugin subcommand is **not installed** on this machine.
-- Never instruct anyone to `npm install` on the host, or to install Node.
-- The one-off form is `docker-compose run --rm app <command>`.
+* Use `Makefile` targets. Run `make` to list them.
+* Use `docker-compose` when the `docker compose` plugin is unavailable.
+* Never instruct anyone to install Node or run `npm install` on the host.
+* One-off commands: `docker-compose run --rm app <command>`.
 
-| Task | Command |
-| --- | --- |
-| Start the dev server | `make up` |
-| Run all quality gates | `make check` |
-| Tests | `make test` |
-| Add a runtime dependency | `make add PKG=<name>` |
-| Add a dev dependency | `make add-dev PKG=<name>` |
+| Task                   | Command                   |
+| ---------------------- | ------------------------- |
+| Start dev server       | `make up`                 |
+| All quality gates      | `make check`              |
+| Tests                  | `make test`               |
+| Add runtime dependency | `make add PKG=<name>`     |
+| Add dev dependency     | `make add-dev PKG=<name>` |
 
-## Project conventions
+## Documentation and milestones
 
-- Long-form documentation lives in `docs/`.
-- `docs/MASTER-PLAN.md` holds architecture decisions and the milestone index.
-- Each milestone has `docs/M<NN>-<name>.md` with its implementation plan and live
-  progress. Numbers are incremental and never reused.
-- **Update the milestone document as work happens, not at the end.** Record what was
-  implemented and what was deferred, with the reason. A later reader must be able to
-  tell a deliberate omission from an oversight.
-- When a decision outlives its milestone, promote it into `MASTER-PLAN.md` §4 and
-  leave the detailed rationale in the milestone file.
+* Long-form documentation belongs in `docs/`.
+* `docs/MASTER-PLAN.md` contains architecture decisions and the milestone index.
+* Each milestone uses `docs/M<NN>-<name>.md`. Numbers increase and are never reused.
+* Update milestone documents **while work happens**, recording implemented and deferred work with reasons so deliberate omissions are distinguishable from oversights.
+* If a decision outlives its milestone, promote it to `MASTER-PLAN.md` §4 while keeping detailed rationale in the milestone document.
 
-## Expo and React Native conventions
+For major component additions or changes, update as applicable:
 
-- This is the **managed** Expo workflow. `ios/` and `android/` directories are not
-  checked in and must not be committed; they are generated output.
-- Add React Native / Expo packages with `make add PKG=<name>` (`expo install`), which
-  picks the version matching the installed SDK. A bare `npm install` will pull the
-  newest release and can silently break the SDK alignment.
-- Prefer packages supported by **Expo Go**. Anything requiring custom native code
-  breaks the current device-testing setup, which relies on Expo Go — if it is
-  genuinely needed, say so explicitly rather than adding it quietly.
-- Keep the app working on **both** native and web. Web is the local preview and the
-  only thing that runs on this machine; do not use APIs that break it without
-  isolating them behind a platform check.
-- Do not edit `app.json` version or SDK fields as a side effect of another change.
+1. `README.md` when setup, commands, prerequisites, or dependencies change.
+2. The relevant milestone document, including deferred work.
+3. `docs/MASTER-PLAN.md` when an architecture decision is settled or reopened.
+4. Tests for new or changed behavior.
 
-## TypeScript conventions
+## Expo and React Native
 
-- Use TypeScript strict mode.
-- Use small React components with clear props.
-- Keep remote data access in dedicated API client modules, isolated from components.
-  The data-fetching/caching library is **not yet chosen** — see `MASTER-PLAN.md` §5.3.
-- Keep reusable UI primitives separate from feature components.
-- Keep domain logic (conversion, rounding, formatting) in plain TypeScript modules
-  with no React imports, so it can be tested without rendering.
-- **Never use raw JavaScript floating-point arithmetic for monetary values.** The
-  numeric representation is an open decision (`MASTER-PLAN.md` §5.5); until it is
-  made, do not write conversion logic.
+* Use the **managed Expo workflow**.
+* `ios/` and `android/` are generated output. Do not check them in or commit them.
+* Add React Native/Expo packages with `make add PKG=<name>` using `expo install`, which preserves SDK compatibility. Do not use bare `npm install`.
+* Prefer **Expo Go** compatible packages. If custom native code is genuinely required, explicitly call out that it breaks the current Expo Go device-testing setup.
+* Keep both native and web working. Web is the local preview and the only platform runnable on this machine.
+* Isolate native-only APIs behind platform checks.
+* Do not modify `app.json` version or SDK fields as an unrelated side effect.
 
-## Testing conventions
+## TypeScript and architecture
 
-Stack: **Jest** with the `jest-expo` preset, and **React Native Testing Library**.
+* Use TypeScript strict mode.
+* Use small React components with clear props.
+* Keep reusable UI primitives separate from feature components.
+* Put remote data access in dedicated API client modules, not components.
+* The data-fetching/caching library remains undecided. See `MASTER-PLAN.md` §5.3.
+* Keep domain logic such as conversion, rounding, and formatting in plain TypeScript modules without React imports.
+* **Never use JavaScript floating-point arithmetic for monetary values.**
+* Numeric representation remains undecided. See `MASTER-PLAN.md` §5.5. Do not implement conversion logic until that decision is made.
 
-- Run with `make test`, or `make test-watch` while developing.
-- Place tests next to the code they cover, named `<name>.test.ts` / `<name>.test.tsx`.
-- **`render` from `@testing-library/react-native` is async and must be awaited.**
-  v14 made the whole API async because React 19's `act` is async. Writing
-  `const { getByText } = render(<App />)` — the pattern from older versions and most
-  online examples — silently yields undefined queries.
+## Testing
 
-  ```tsx
-  await render(<App />);
-  expect(screen.getByText(/…/)).toBeOnTheScreen();
-  ```
+Stack: **Jest** with `jest-expo` and **React Native Testing Library**.
 
-- **`fireEvent` is async for the same reason, and is the easier one to miss.** An
-  un-awaited press leaves the state update unflushed, so the assertion that follows
-  reads the *previous* render and the test fails for a reason that has nothing to do
-  with the component.
+* Use `make test`, or `make test-watch` during development.
+* Co-locate tests as `<name>.test.ts` or `<name>.test.tsx`.
+* In React Native Testing Library v14, `render` and `fireEvent` are async because React 19 `act` is async. **Always await them.**
 
-  ```tsx
-  await fireEvent.press(screen.getByRole('button', { name: 'Close' }));
-  ```
+```tsx
+await render(<App />);
+expect(screen.getByText(/…/)).toBeOnTheScreen();
 
-- Test behaviour through the public surface: query by text, role and accessibility
-  label rather than by test ID or internal component structure.
-- Cover domain logic (conversion, rounding, formatting, parsing of API responses)
-  with plain unit tests. This is where currency bugs actually live.
-- Do not weaken an assertion to make a test pass. Fix the cause.
+await fireEvent.press(screen.getByRole('button', { name: 'Close' }));
+```
+
+Un-awaited calls may query stale or undefined state and produce misleading failures.
+
+* Test behavior through public surfaces using text, role, and accessibility labels rather than test IDs or internal structure.
+* Unit-test domain logic including conversion, rounding, formatting, and API-response parsing.
+* Fix causes of failures, not assertions.
 
 ## Comments
 
-- Avoid using inline comments if not absolutely necessary.
-- Write code that documents itself. Method and variable namings should be meaningful and self-explanatory.
-- Prefer writing comments as summarized class or method docs instead of inline comments.
-- Explain non-obvious architectural choices in code comments or docs.
+* Avoid inline comments unless necessary.
+* Prefer self-documenting names and code.
+* Prefer concise class/method documentation over inline commentary.
+* Document non-obvious architectural decisions in code comments or documentation.
 
-## Version control conventions
+## Version control
 
-- Use Git for version control.
-- Use a feature branch named for the milestone it implements:
-  `feature/M<NN>-short-description` (e.g. `feature/M02-rate-provider`), matching the
-  milestone document in `docs/`.
-- Use a bugfix branch named for the defect: `bugfix/short-description`. Bugfixes are
-  not tied to a milestone.
-- After the feature development or bugfix is complete and the changes approved, merge
-  squash commits into the `main` branch, keep the feature/bugfix branches unchanged.
-- Use descriptive commit messages: what changed and why, not just what.
+* Use Git.
+* Feature branches: `feature/M<NN>-short-description`, matching the milestone document, e.g. `feature/M02-rate-provider`.
+* Bugfix branches: `bugfix/short-description`. Bugfixes are not milestone-bound.
+* After approved feature/bugfix completion, squash-merge into `main` and leave the source branch unchanged.
+* Commit messages must describe what changed and why.
 
-## Security conventions
+## Security
 
-- **Anything in the app bundle is public.** React Native ships your JavaScript to the
-  device; there is no server side to hide behind. Assume any value compiled into the
-  app can be extracted.
-- Environment variables prefixed `EXPO_PUBLIC_` are **inlined into the bundle at build
-  time**. They are configuration, not secrets. Never put a credential behind that
-  prefix because the name looks harmless.
-- A rate-provider API key that must stay secret therefore cannot live in the app. It
-  requires a server-side proxy — an architectural consequence, not an implementation
-  detail. See `MASTER-PLAN.md` §5.2 before assuming either way.
-- Never commit secrets. `.env` and `.env.*` are gitignored; keep it that way.
-- Use HTTPS for every network call. Do not disable certificate validation.
-- Do not log sensitive values, including full API responses that may contain keys.
-- Treat all API responses as untrusted input: validate shape and types before use
-  rather than trusting the provider's documentation.
-- Keep dependencies pinned via `package-lock.json`, and commit lockfile changes
-  alongside `package.json`.
-
-## Documentation requirements
-
-When adding or changing a major component, update:
-
-1. `README.md`, if setup, commands, prerequisites or dependencies changed.
-2. The relevant milestone document under `docs/`, including anything deferred.
-3. `docs/MASTER-PLAN.md`, if the change settles or reopens an architecture decision.
-4. Tests covering the new or changed behaviour.
+* Assume **everything bundled with the app is public** because React Native ships JavaScript to devices.
+* `EXPO_PUBLIC_` environment variables are build-time configuration exposed in the bundle, **not secrets**.
+* Secrets such as rate-provider API keys cannot live in the app and require a server-side proxy. See `MASTER-PLAN.md` §5.2 before making assumptions.
+* Never commit secrets. Keep `.env` and `.env.*` gitignored.
+* Use HTTPS for every network request and never disable certificate validation.
+* Never log sensitive values, including full API responses that might contain credentials.
+* Treat API responses as untrusted. Validate their shape and types before use.
+* Pin dependencies with `package-lock.json` and commit lockfile changes together with `package.json`.
 
 ## Code review
 
-Evaluate the code based on the following aspects:
-- Adherence to the documented specs and requirements
-- Code quality and adherence to best practices
-- Code smells (redundancy, overly complex logic, tight coupling)
-- Adherence to naming conventions and stylistic consistency with the rest of the repo.
-- Potential bugs or unhandled edge cases
-- Performance optimizations
-- Readability and maintainability
-- Any security vulnerabilities
-- Test coverage adequacy
+Evaluate:
 
-In your output:
-- Begin with a brief summary of the overall code quality
-- Line numbers start at 1, based on the code as presented
-- Clear improvement suggessions for each finding
+* Compliance with documented specifications and requirements.
+* Code quality and best practices.
+* DRY, KISS, SOLID, and YAGNI.
+* Redundancy, complexity, coupling, naming, and consistency.
+* Bugs, unhandled edge cases, and silent failures. Prefer failing loudly over hiding bugs.
+* Performance.
+* Readability and maintainability.
+* Security vulnerabilities.
+* Test coverage.
 
-If no issues are found, briefly state that the code meets best practices.
+Actively look for code or tests that should be removed or simplified:
+
+* **Over-engineering:** abstractions, options, or indirection with one caller and no realistic second use.
+* **Over-defensive code:** unnecessary `try`/`catch`, null/undefined guards, or fallbacks for states already excluded by types/callers. Identify which caller could produce the state. If none can, treat it as dead code.
+* **Paranoid validation:** excessive validation, normalization, casting, or formatting of predictable inputs, especially configuration/admin inputs.
+* **Small single-use functions:** inline helpers used once when their name adds no meaning beyond the implementation, especially predicates that only restate an operator.
+* **Extreme edge cases:** remove code/tests for highly speculative, very low-value situations.
+* **Tests preserving dead code:** if a test must bypass the type system to reach a branch, treat that as evidence the branch is unreachable and recommend deleting both.
+
+Review output requirements:
+
+* Start with a brief overall code-quality summary.
+* Line numbers start at 1 and refer to the code exactly as presented.
+* Give clear improvement suggestions for every finding.
+* If no issues exist, briefly state that the code follows best practices.
 
 ## Definition of done
 
-A change is ready when:
+A change is ready only when:
 
-- `make check` passes — this runs lint, format check, typecheck, knip and tests.
-- Tests cover the new or changed behaviour.
-- Public interfaces are documented.
-- Documentation is updated per the section above.
-- No unused files, exports or dependencies were introduced (`make knip`).
+* `make check` passes, including lint, formatting, typecheck, knip, and tests.
+* Tests cover new or changed behavior.
+* Public interfaces are documented.
+* Required README, milestone, and `MASTER-PLAN.md` documentation is updated.
+* `make knip` confirms no unused files, exports, or dependencies.

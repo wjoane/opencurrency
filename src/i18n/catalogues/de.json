@@ -28,7 +28,7 @@
   "converter.moveDownLabel": "{currency} nach unten verschieben",
   "date.change": "Datum ändern",
   "date.label": "Kursdatum",
-  "date.today": "Heute",
+  "date.latest": "Neueste",
   "rates.midMarket": "Mittelkurse",
   "rates.info.title": "Über diese Kurse",
   "rates.info.basis": "Beträge werden zum täglichen Mittelkurs umgerechnet, dem Mittelwert zwischen An- und Verkaufskurs, vor Gebühren und Aufschlägen.",

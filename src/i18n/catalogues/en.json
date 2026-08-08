@@ -28,7 +28,7 @@
   "converter.moveDownLabel": "Move {currency} down",
   "date.change": "Change date",
   "date.label": "Rate date",
-  "date.today": "Today",
+  "date.latest": "Latest",
   "rates.midMarket": "Mid-market rates",
   "rates.info.title": "About these rates",
   "rates.info.basis": "Amounts are converted at the daily mid-market reference rate, the midpoint between the buying and the selling price, before any fee or margin.",

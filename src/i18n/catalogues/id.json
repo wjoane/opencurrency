@@ -28,7 +28,7 @@
   "converter.moveDownLabel": "Pindahkan {currency} ke bawah",
   "date.change": "Ubah tanggal",
   "date.label": "Tanggal kurs",
-  "date.today": "Hari ini",
+  "date.latest": "Terbaru",
   "rates.midMarket": "Kurs tengah pasar",
   "rates.info.title": "Tentang kurs ini",
   "rates.info.basis": "Nominal dikonversi dengan kurs tengah pasar harian, titik tengah antara harga beli dan harga jual, sebelum biaya atau margin.",

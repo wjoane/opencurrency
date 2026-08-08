@@ -28,7 +28,7 @@
   "converter.moveDownLabel": "{currency} birimini aşağı taşı",
   "date.change": "Tarihi değiştir",
   "date.label": "Kur tarihi",
-  "date.today": "Bugün",
+  "date.latest": "En son",
   "rates.midMarket": "Piyasa orta kurları",
   "rates.info.title": "Bu kurlar hakkında",
   "rates.info.basis": "Tutarlar günlük piyasa orta kuruyla çevrilir, alış ve satış fiyatının ortası, komisyon ve marj eklenmeden önce.",

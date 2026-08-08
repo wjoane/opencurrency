@@ -28,7 +28,7 @@
   "converter.moveDownLabel": "Mover {currency} para baixo",
   "date.change": "Alterar a data",
   "date.label": "Data das taxas",
-  "date.today": "Hoje",
+  "date.latest": "Mais recente",
   "rates.midMarket": "Taxas médias de mercado",
   "rates.info.title": "Sobre estas taxas",
   "rates.info.basis": "Os valores são convertidos pela taxa média de mercado do dia, o ponto médio entre o preço de compra e o de venda, antes de tarifas ou margens.",

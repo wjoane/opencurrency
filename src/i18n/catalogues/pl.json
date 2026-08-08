@@ -28,7 +28,7 @@
   "converter.moveDownLabel": "Przenieś {currency} w dół",
   "date.change": "Zmień datę",
   "date.label": "Data kursów",
-  "date.today": "Dziś",
+  "date.latest": "Najnowsze",
   "rates.midMarket": "Kursy średnie rynkowe",
   "rates.info.title": "O tych kursach",
   "rates.info.basis": "Kwoty są przeliczane po dziennym średnim kursie rynkowym, punkcie pośrednim między ceną kupna a ceną sprzedaży, przed prowizjami i marżą.",

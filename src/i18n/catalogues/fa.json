@@ -28,7 +28,7 @@
   "converter.moveDownLabel": "انتقال {currency} به پایین",
   "date.change": "تغییر تاریخ",
   "date.label": "تاریخ نرخ‌ها",
-  "date.today": "امروز",
+  "date.latest": "آخرین",
   "rates.midMarket": "نرخ‌های میانه بازار",
   "rates.info.title": "درباره این نرخ‌ها",
   "rates.info.basis": "مبالغ با نرخ میانه بازار روزانه تبدیل می‌شوند، نقطه میانی قیمت خرید و فروش، پیش از هر کارمزد یا حاشیه سود.",

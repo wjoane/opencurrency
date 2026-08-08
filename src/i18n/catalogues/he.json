@@ -28,7 +28,7 @@
   "converter.moveDownLabel": "העברת {currency} למטה",
   "date.change": "שינוי תאריך",
   "date.label": "תאריך השערים",
-  "date.today": "היום",
+  "date.latest": "העדכני ביותר",
   "rates.midMarket": "שערים אמצעיים",
   "rates.info.title": "על השערים האלה",
   "rates.info.basis": "הסכומים מומרים לפי השער האמצעי היומי, נקודת האמצע בין מחיר הקנייה למחיר המכירה, לפני עמלות ומרווח.",

@@ -28,7 +28,7 @@
   "converter.moveDownLabel": "نقل {currency} إلى الأسفل",
   "date.change": "تغيير التاريخ",
   "date.label": "تاريخ الأسعار",
-  "date.today": "اليوم",
+  "date.latest": "الأحدث",
   "rates.midMarket": "أسعار السوق الوسطية",
   "rates.info.title": "عن هذه الأسعار",
   "rates.info.basis": "تُحوَّل المبالغ بسعر السوق الوسطي اليومي، النقطة الوسطى بين سعر الشراء وسعر البيع، قبل أي رسوم أو هامش.",

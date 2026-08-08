@@ -28,7 +28,7 @@
   "converter.moveDownLabel": "{currency} を下に移動",
   "date.change": "日付を変更",
   "date.label": "レートの日付",
-  "date.today": "今日",
+  "date.latest": "最新",
   "rates.midMarket": "仲値レート",
   "rates.info.title": "このレートについて",
   "rates.info.basis": "金額は日次の仲値レート（買値と売値の中間で、手数料やスプレッドを含まない値）で換算しています。",

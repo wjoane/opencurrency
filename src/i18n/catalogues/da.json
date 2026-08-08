@@ -28,7 +28,7 @@
   "converter.moveDownLabel": "Flyt {currency} ned",
   "date.change": "Skift dato",
   "date.label": "Kursdato",
-  "date.today": "I dag",
+  "date.latest": "Seneste",
   "rates.midMarket": "Middelkurser",
   "rates.info.title": "Om disse kurser",
   "rates.info.basis": "Beløb omregnes til dagens middelkurs, midtpunktet mellem købs- og salgskurs, før gebyrer og margin.",

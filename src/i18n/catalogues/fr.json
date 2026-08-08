@@ -28,7 +28,7 @@
   "converter.moveDownLabel": "Déplacer {currency} vers le bas",
   "date.change": "Changer la date",
   "date.label": "Date des taux",
-  "date.today": "Aujourd’hui",
+  "date.latest": "Plus récent",
   "rates.midMarket": "Taux moyens du marché",
   "rates.info.title": "À propos de ces taux",
   "rates.info.basis": "Les montants sont convertis au taux moyen du marché du jour, le point médian entre le cours acheteur et le cours vendeur, avant frais et marge.",

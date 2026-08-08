@@ -10,6 +10,7 @@ import {
   useReducer,
   useState,
 } from 'react';
+import { AppState } from 'react-native';
 
 import {
   createRateRepository,
@@ -26,29 +27,43 @@ interface RatesState {
   readonly status: RatesStatus;
   readonly snapshot: RateSnapshot;
   readonly failure: RateFetchFailure | null;
+  readonly latestKnownDate: string;
 }
 
 const INITIAL_STATE: RatesState = {
   status: 'loading',
   snapshot: BUNDLED_RATE_SNAPSHOT,
   failure: null,
+  latestKnownDate: BUNDLED_RATE_SNAPSHOT.date,
 };
 
 type RatesAction =
-  { readonly type: 'requested' } | { readonly type: 'resolved'; outcome: SnapshotOutcome };
+  | { readonly type: 'requested' }
+  | { readonly type: 'resolved'; readonly outcome: SnapshotOutcome; readonly latest: boolean };
 
 function reduce(state: RatesState, action: RatesAction): RatesState {
   if (action.type === 'requested') {
-    return { status: 'loading', snapshot: state.snapshot, failure: null };
+    return { ...state, status: 'loading', failure: null };
   }
 
-  switch (action.outcome.status) {
+  const { outcome } = action;
+  const latestKnownDate =
+    action.latest && outcome.status !== 'unavailable'
+      ? outcome.snapshot.date
+      : state.latestKnownDate;
+
+  switch (outcome.status) {
     case 'ok':
-      return { status: 'ready', snapshot: action.outcome.snapshot, failure: null };
+      return { status: 'ready', snapshot: outcome.snapshot, failure: null, latestKnownDate };
     case 'stale':
-      return { status: 'stale', snapshot: action.outcome.snapshot, failure: action.outcome.reason };
+      return {
+        status: 'stale',
+        snapshot: outcome.snapshot,
+        failure: outcome.reason,
+        latestKnownDate,
+      };
     default:
-      return { status: 'error', snapshot: state.snapshot, failure: action.outcome.reason };
+      return { ...state, status: 'error', failure: outcome.reason };
   }
 }
 
@@ -73,6 +88,7 @@ export function RatesProvider({ children, repository }: RatesProviderProps) {
 
   useEffect(() => {
     let cancelled = false;
+    const latest = selectedDate === null;
 
     dispatch({ type: 'requested' });
 
@@ -83,7 +99,7 @@ export function RatesProvider({ children, repository }: RatesProviderProps) {
 
     void request.then((outcome) => {
       if (!cancelled) {
-        dispatch({ type: 'resolved', outcome });
+        dispatch({ type: 'resolved', outcome, latest });
       }
     });
 
@@ -93,6 +109,16 @@ export function RatesProvider({ children, repository }: RatesProviderProps) {
   }, [resolvedRepository, selectedDate, reloadCount]);
 
   const reload = useCallback(() => setReloadCount((count) => count + 1), []);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (appState) => {
+      if (appState === 'active' && selectedDate === null) {
+        reload();
+      }
+    });
+
+    return () => subscription.remove();
+  }, [selectedDate, reload]);
 
   const value = useMemo<RatesContextValue>(
     () => ({ ...state, selectedDate, selectDate: setSelectedDate, reload }),

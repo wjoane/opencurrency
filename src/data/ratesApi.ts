@@ -40,10 +40,14 @@ type UrlBuilder = (dateSpec: string) => string;
 
 const HOSTS: readonly UrlBuilder[] = [
   (dateSpec) =>
-    `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${dateSpec}/v1/currencies/${REFERENCE_CURRENCY_CODE}.min.json`,
-  (dateSpec) =>
     `https://${dateSpec}.currency-api.pages.dev/v1/currencies/${REFERENCE_CURRENCY_CODE}.min.json`,
+  (dateSpec) =>
+    `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${dateSpec}/v1/currencies/${REFERENCE_CURRENCY_CODE}.min.json`,
 ];
+
+function uncacheable(url: string): string {
+  return `${url}?t=${Date.now()}`;
+}
 
 function isSupportedDateSpec(dateSpec: string): boolean {
   return dateSpec === LATEST_DATE_SPEC || isRateDate(dateSpec);
@@ -91,10 +95,12 @@ export async function fetchRateSnapshot(dateSpec: string): Promise<RateFetchResu
     return { ok: false, reason: 'notFound' };
   }
 
+  const bypassCache = dateSpec === LATEST_DATE_SPEC;
   let failure: RateFetchFailure = 'networkError';
 
   for (const buildUrl of HOSTS) {
-    const result = await fetchFromHost(buildUrl(dateSpec));
+    const url = buildUrl(dateSpec);
+    const result = await fetchFromHost(bypassCache ? uncacheable(url) : url);
 
     if (result.ok) {
       return result;

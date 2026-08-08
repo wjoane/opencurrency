@@ -28,7 +28,7 @@
   "converter.moveDownLabel": "下移 {currency}",
   "date.change": "變更日期",
   "date.label": "匯率日期",
-  "date.today": "今天",
+  "date.latest": "最新",
   "rates.midMarket": "中間價",
   "rates.info.title": "關於這些匯率",
   "rates.info.basis": "金額以每日中間價換算，買價與賣價的中點，不含手續費與加價。",

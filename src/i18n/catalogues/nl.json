@@ -28,7 +28,7 @@
   "converter.moveDownLabel": "{currency} omlaag verplaatsen",
   "date.change": "Datum wijzigen",
   "date.label": "Koersdatum",
-  "date.today": "Vandaag",
+  "date.latest": "Nieuwste",
   "rates.midMarket": "Middenkoersen",
   "rates.info.title": "Over deze koersen",
   "rates.info.basis": "Bedragen worden omgerekend tegen de dagelijkse middenkoers, het midden tussen bied- en laatkoers, vóór kosten of marge.",

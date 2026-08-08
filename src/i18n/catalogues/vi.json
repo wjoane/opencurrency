@@ -28,7 +28,7 @@
   "converter.moveDownLabel": "Di chuyển {currency} xuống",
   "date.change": "Đổi ngày",
   "date.label": "Ngày của tỷ giá",
-  "date.today": "Hôm nay",
+  "date.latest": "Mới nhất",
   "rates.midMarket": "Tỷ giá trung bình thị trường",
   "rates.info.title": "Về các tỷ giá này",
   "rates.info.basis": "Số tiền được quy đổi theo tỷ giá trung bình thị trường hằng ngày — điểm giữa giá mua và giá bán, trước mọi phí hay biên lợi nhuận.",

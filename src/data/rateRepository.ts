@@ -80,7 +80,11 @@ export function createRateRepository(options: RateRepositoryOptions = {}): RateR
       const result = await fetchSnapshot(LATEST_DATE_SPEC);
 
       if (result.ok) {
-        return persist(result.snapshot);
+        const newestCached = await store.readNewest();
+
+        return newestCached !== null && newestCached.date > result.snapshot.date
+          ? { status: 'ok', snapshot: newestCached }
+          : persist(result.snapshot);
       }
 
       const newest = (await store.readNewest()) ?? fallbackSnapshot;

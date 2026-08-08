@@ -28,7 +28,7 @@
   "converter.moveDownLabel": "Mover {currency} hacia abajo",
   "date.change": "Cambiar la fecha",
   "date.label": "Fecha de los tipos",
-  "date.today": "Hoy",
+  "date.latest": "Más reciente",
   "rates.midMarket": "Tipos medios de mercado",
   "rates.info.title": "Sobre estos tipos",
   "rates.info.basis": "Los importes se convierten al tipo medio de mercado del día, el punto medio entre el precio de compra y el de venta, antes de comisiones o márgenes.",

@@ -3,6 +3,7 @@ import { Text } from 'react-native';
 
 import { type RateRepository, type SnapshotOutcome } from '../data/rateRepository';
 import { type RateSnapshot } from '../data/rateSchema';
+import { trackAppState } from '../testing/appState';
 
 import { RatesProvider, useRates } from './RatesContext';
 
@@ -13,7 +14,15 @@ function snapshot(date: string, usdRate = 1.17): RateSnapshot {
 }
 
 function Probe() {
-  const { status, snapshot: current, failure, selectedDate, selectDate, reload } = useRates();
+  const {
+    status,
+    snapshot: current,
+    failure,
+    selectedDate,
+    selectDate,
+    reload,
+    latestKnownDate,
+  } = useRates();
 
   return (
     <>
@@ -21,6 +30,7 @@ function Probe() {
       <Text>{`date:${current?.date ?? 'none'}`}</Text>
       <Text>{`failure:${failure ?? 'none'}`}</Text>
       <Text>{`selected:${selectedDate ?? 'latest'}`}</Text>
+      <Text>{`latestKnown:${latestKnownDate}`}</Text>
       <Text accessibilityRole="button" onPress={() => selectDate('2024-03-02')}>
         pick
       </Text>
@@ -40,6 +50,10 @@ function stubRepository(
     loadDate: jest.fn((_date: string) => Promise.resolve(byDate)),
   };
 }
+
+afterEach(() => {
+  jest.restoreAllMocks();
+});
 
 async function renderProbe(repository: RateRepository) {
   await render(
@@ -128,6 +142,78 @@ describe('RatesProvider', () => {
     await fireEvent.press(screen.getByRole('button', { name: 'reload' }));
 
     expect(repository.loadLatest).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('the latest known date', () => {
+  it('is the bundled day until a request settles', async () => {
+    await renderProbe({
+      loadLatest: () => new Promise(() => {}),
+      loadDate: () => new Promise(() => {}),
+    });
+
+    expect(screen.getByText('latestKnown:2026-08-01')).toBeOnTheScreen();
+  });
+
+  it('follows the day a latest-load reports, even when that day is stale', async () => {
+    await renderProbe(
+      stubRepository({ status: 'stale', snapshot: snapshot('2026-07-20'), reason: 'networkError' }),
+    );
+
+    expect(screen.getByText('latestKnown:2026-07-20')).toBeOnTheScreen();
+  });
+
+  it('ignores a picked date, which says nothing about what the latest day is', async () => {
+    const repository = stubRepository(
+      { status: 'ok', snapshot: snapshot(TODAY) },
+      { status: 'ok', snapshot: snapshot('2024-03-02', 1.09) },
+    );
+
+    await renderProbe(repository);
+    await fireEvent.press(screen.getByRole('button', { name: 'pick' }));
+
+    expect(screen.getByText('date:2024-03-02')).toBeOnTheScreen();
+    expect(screen.getByText(`latestKnown:${TODAY}`)).toBeOnTheScreen();
+  });
+});
+
+describe('returning to the foreground', () => {
+  it('asks for the latest rates again, because a day may have passed', async () => {
+    const sendAppState = trackAppState();
+    const repository = stubRepository({ status: 'ok', snapshot: snapshot(TODAY) });
+
+    await renderProbe(repository);
+    await sendAppState('active');
+
+    expect(repository.loadLatest).toHaveBeenCalledTimes(2);
+  });
+
+  it('asks for nothing while a past date is being shown', async () => {
+    const sendAppState = trackAppState();
+    const repository = stubRepository(
+      { status: 'ok', snapshot: snapshot(TODAY) },
+      { status: 'ok', snapshot: snapshot('2024-03-02', 1.09) },
+    );
+
+    await renderProbe(repository);
+    await fireEvent.press(screen.getByRole('button', { name: 'pick' }));
+
+    repository.loadLatest.mockClear();
+    repository.loadDate.mockClear();
+    await sendAppState('active');
+
+    expect(repository.loadLatest).not.toHaveBeenCalled();
+    expect(repository.loadDate).not.toHaveBeenCalled();
+  });
+
+  it('asks for nothing when the app is merely leaving the foreground', async () => {
+    const sendAppState = trackAppState();
+    const repository = stubRepository({ status: 'ok', snapshot: snapshot(TODAY) });
+
+    await renderProbe(repository);
+    await sendAppState('background');
+
+    expect(repository.loadLatest).toHaveBeenCalledTimes(1);
   });
 });
 

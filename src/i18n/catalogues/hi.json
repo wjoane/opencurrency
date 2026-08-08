@@ -28,7 +28,7 @@
   "converter.moveDownLabel": "{currency} को नीचे ले जाएँ",
   "date.change": "तारीख़ बदलें",
   "date.label": "दर की तारीख़",
-  "date.today": "आज",
+  "date.latest": "नवीनतम",
   "rates.midMarket": "मिड-मार्केट दरें",
   "rates.info.title": "इन दरों के बारे में",
   "rates.info.basis": "राशियाँ दिन की मिड-मार्केट दर पर बदली जाती हैं, खरीद और बिक्री मूल्य का मध्य बिंदु, किसी शुल्क या मार्जिन से पहले।",

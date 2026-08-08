@@ -13,7 +13,7 @@
   <a href="https://reactnative.dev/"><img src="https://img.shields.io/badge/React%20Native-0.86-61DAFB?logo=react&logoColor=black" alt="React Native 0.86" /></a>
   <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white" alt="TypeScript strict mode" /></a>
   <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-required-2496ED?logo=docker&logoColor=white" alt="Docker required" /></a>
-  <a href="./LICENSE.md"><img src="https://img.shields.io/badge/License-GPL--3.0--or--later-3DA639" alt="GPL-3.0-or-later license" /></a>
+  <a href="./LICENSE.md"><img src="https://img.shields.io/badge/License-GPL--3.0-3DA639" alt="GPL-3.0 license" /></a>
 </p>
 
 <p align="center">
@@ -91,7 +91,7 @@ target expansion without executing destructive commands.
 
 ```text
 currency provider → response validation → persistent rate cache → exact conversion → converter screen
-                         └─ jsDelivr fallback: currency-api.pages.dev
+                         └─ Cloudflare fallback: jsDelivr
 ```
 
 - Rates are fetched over HTTPS from
@@ -153,7 +153,7 @@ target is a local development preview, not a supported production surface.
 
 ## License
 
-Open Currency is licensed under the [GNU General Public License v3.0 or later](./LICENSE.md).
+Open Currency is licensed under the [GNU General Public License v3.0](./LICENSE.md).
 
 ---
 

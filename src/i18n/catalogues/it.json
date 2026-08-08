@@ -28,7 +28,7 @@
   "converter.moveDownLabel": "Sposta {currency} in basso",
   "date.change": "Cambia data",
   "date.label": "Data dei tassi",
-  "date.today": "Oggi",
+  "date.latest": "Più recente",
   "rates.midMarket": "Tassi medi di mercato",
   "rates.info.title": "Informazioni sui tassi",
   "rates.info.basis": "Gli importi sono convertiti al tasso medio di mercato del giorno, il punto intermedio fra prezzo di acquisto e di vendita, prima di commissioni o margini.",

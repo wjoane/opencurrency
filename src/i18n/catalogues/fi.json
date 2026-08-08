@@ -28,7 +28,7 @@
   "converter.moveDownLabel": "Siirrä {currency} alas",
   "date.change": "Vaihda päivä",
   "date.label": "Kurssipäivä",
-  "date.today": "Tänään",
+  "date.latest": "Uusin",
   "rates.midMarket": "Keskikurssit",
   "rates.info.title": "Tietoja kursseista",
   "rates.info.basis": "Summat muunnetaan päivän keskikurssilla, osto- ja myyntihinnan puolivälillä, ennen palkkioita ja katetta.",

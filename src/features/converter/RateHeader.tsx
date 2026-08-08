@@ -11,7 +11,6 @@ import { useThemedStyles } from '../../theme/useThemedStyles';
 import { CalendarIcon } from '../../ui/icons';
 import { Sheet } from '../../ui/Sheet';
 
-import { currentRateDate, latestSelectableRateDate } from './dateBounds';
 import { DatePicker } from './DatePicker';
 
 const NOTICE_MESSAGE_KEYS: Readonly<
@@ -32,17 +31,12 @@ const NOTICE_MESSAGE_KEYS: Readonly<
 const CALENDAR_ICON_SIZE = 20;
 
 export function RateHeader() {
-  const { status, snapshot, failure, reload, selectedDate, selectDate } = useRates();
+  const { status, snapshot, failure, reload, selectedDate, selectDate, latestKnownDate } =
+    useRates();
   const { theme } = useTheme();
   const { t } = useI18n();
   const styles = useThemedStyles(createStyles);
-  const [pickerVisible, setPickerVisible] = useState(false);
-
-  const today = currentRateDate();
-
-  const pickerDate = selectedDate ?? today;
-
-  const maximumDate = latestSelectableRateDate(today, pickerDate);
+  const canChangeDate = status !== 'stale';
 
   const dateText =
     status === 'loading' ? t('header.loading') : t('header.ratesFrom', { date: snapshot.date });
@@ -52,40 +46,25 @@ export function RateHeader() {
   return (
     <View style={styles.header}>
       <View style={styles.dateLine}>
-        <Pressable
-          onPress={() => setPickerVisible(true)}
-          accessibilityRole="button"
-          accessibilityLabel={t('date.change')}
-          hitSlop={theme.spacing.md}
-        >
-          <CalendarIcon color={theme.colors.primary} size={CALENDAR_ICON_SIZE} />
-        </Pressable>
+        {canChangeDate && (
+          <RateDateControl
+            selectedDate={selectedDate}
+            latestKnownDate={latestKnownDate}
+            onSelect={selectDate}
+          />
+        )}
         <Text style={styles.date}>{dateText}</Text>
-        {(selectedDate !== null || snapshot.date !== today) && (
+        {selectedDate !== null && (
           <Pressable
             onPress={() => selectDate(null)}
             accessibilityRole="button"
-            accessibilityLabel={t('date.today')}
+            accessibilityLabel={t('date.latest')}
             hitSlop={theme.spacing.sm}
           >
-            <Text style={styles.action}>{t('date.today')}</Text>
+            <Text style={styles.action}>{t('date.latest')}</Text>
           </Pressable>
         )}
       </View>
-      {pickerVisible && (
-        <RateDatePicker
-          value={pickerDate}
-          maximumDate={maximumDate}
-          label={t('date.label')}
-          closeLabel={t('sheet.close')}
-          onDismiss={() => setPickerVisible(false)}
-          onChange={(rateDate) => {
-            setPickerVisible(false);
-
-            selectDate(rateDate === today ? null : rateDate);
-          }}
-        />
-      )}
       {noticeKey !== null && (
         <View style={styles.notice}>
           <Text style={[styles.noticeText, status === 'error' && styles.noticeError]}>
@@ -100,41 +79,52 @@ export function RateHeader() {
   );
 }
 
-interface RateDatePickerProps {
-  readonly value: string;
-  readonly maximumDate: string;
-  readonly label: string;
-  readonly closeLabel: string;
-  readonly onChange: (rateDate: string) => void;
-  readonly onDismiss: () => void;
+interface RateDateControlProps {
+  readonly selectedDate: string | null;
+  readonly latestKnownDate: string;
+  readonly onSelect: (rateDate: string | null) => void;
 }
 
-function RateDatePicker({
-  value,
-  maximumDate,
-  label,
-  closeLabel,
-  onChange,
-  onDismiss,
-}: RateDatePickerProps) {
+function RateDateControl({ selectedDate, latestKnownDate, onSelect }: RateDateControlProps) {
+  const { theme } = useTheme();
+  const { t } = useI18n();
+  const [pickerVisible, setPickerVisible] = useState(false);
+
+  const close = () => setPickerVisible(false);
+
   const picker = (
     <DatePicker
-      value={value}
-      maximumDate={maximumDate}
-      accessibilityLabel={label}
-      onChange={onChange}
-      onDismiss={onDismiss}
+      value={selectedDate ?? latestKnownDate}
+      maximumDate={latestKnownDate}
+      accessibilityLabel={t('date.label')}
+      onChange={(rateDate) => {
+        close();
+
+        onSelect(rateDate === latestKnownDate ? null : rateDate);
+      }}
+      onDismiss={close}
     />
   );
 
-  if (Platform.OS === 'android') {
-    return picker;
-  }
-
   return (
-    <Sheet visible onClose={onDismiss} title={label} closeLabel={closeLabel}>
-      {picker}
-    </Sheet>
+    <>
+      <Pressable
+        onPress={() => setPickerVisible(true)}
+        accessibilityRole="button"
+        accessibilityLabel={t('date.change')}
+        hitSlop={theme.spacing.md}
+      >
+        <CalendarIcon color={theme.colors.primary} size={CALENDAR_ICON_SIZE} />
+      </Pressable>
+      {pickerVisible &&
+        (Platform.OS === 'android' ? (
+          picker
+        ) : (
+          <Sheet visible onClose={close} title={t('date.label')} closeLabel={t('sheet.close')}>
+            {picker}
+          </Sheet>
+        ))}
+    </>
   );
 }
 

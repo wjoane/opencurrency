@@ -28,7 +28,7 @@
   "converter.moveDownLabel": "Přesunout {currency} dolů",
   "date.change": "Změnit datum",
   "date.label": "Datum kurzů",
-  "date.today": "Dnes",
+  "date.latest": "Nejnovější",
   "rates.midMarket": "Střední tržní kurzy",
   "rates.info.title": "O těchto kurzech",
   "rates.info.basis": "Částky se převádějí denním středním tržním kurzem, středem mezi nákupní a prodejní cenou, před poplatky a marží.",

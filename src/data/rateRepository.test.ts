@@ -74,6 +74,18 @@ describe('createRateRepository', () => {
       expect(outcome).toEqual({ status: 'ok', snapshot: snapshot(TODAY, 1.19) });
     });
 
+    it('never moves the rates backwards when `latest` answers with an older day', async () => {
+      const store = createSnapshotStore();
+      await store.write(snapshot(YESTERDAY, 1.15));
+
+      const stale = '2026-07-20';
+      const fetchSnapshot = respondWith({ ok: true, snapshot: snapshot(stale, 1.05) });
+      const outcome = await repositoryWith(fetchSnapshot, { store }).loadLatest();
+
+      expect(outcome).toEqual({ status: 'ok', snapshot: snapshot(YESTERDAY, 1.15) });
+      expect(await store.read(stale)).toBeNull();
+    });
+
     it('causes exactly one fetch when two callers ask at the same time', async () => {
       const fetchSnapshot = respondWith({ ok: true, snapshot: snapshot(TODAY) });
       const repository = repositoryWith(fetchSnapshot);

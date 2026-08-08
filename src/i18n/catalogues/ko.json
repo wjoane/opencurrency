@@ -28,7 +28,7 @@
   "converter.moveDownLabel": "{currency} 아래로 이동",
   "date.change": "날짜 변경",
   "date.label": "환율 날짜",
-  "date.today": "오늘",
+  "date.latest": "최신",
   "rates.midMarket": "중간 시장 환율",
   "rates.info.title": "이 환율에 대하여",
   "rates.info.basis": "금액은 일일 중간 시장 환율로 환산됩니다. 매수가와 매도가의 중간값이며, 수수료나 마진이 붙기 전 값입니다.",

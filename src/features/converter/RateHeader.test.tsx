@@ -5,6 +5,7 @@ import { type RateRepository, type SnapshotOutcome } from '../../data/rateReposi
 import { type RateSnapshot } from '../../data/rateSchema';
 import { I18nProvider } from '../../i18n/I18nContext';
 import { RatesProvider, useRates } from '../../state/RatesContext';
+import { trackAppState } from '../../testing/appState';
 import {
   dismissPicker,
   platformPickerProps,
@@ -12,18 +13,21 @@ import {
 } from '../../testing/platformDatePicker';
 import { ThemeProvider } from '../../theme/ThemeContext';
 
-import { currentRateDate, toUtcDate } from './dateBounds';
+import { EARLIEST_RATE_DATE, toUtcDate } from './dateBounds';
 import { RateHeader } from './RateHeader';
 
+/** The day the provider answers with, which the device clock has no say in. */
+const LATEST_DATE = '2026-08-03';
+
 const SNAPSHOT: RateSnapshot = {
-  date: currentRateDate(),
+  date: LATEST_DATE,
   baseCurrencyCode: 'eur',
   rates: { eur: 1, usd: 1.0842 },
 };
 
-const STALE_SNAPSHOT: RateSnapshot = { ...SNAPSHOT, date: '2026-07-27' };
+const OLDER_SNAPSHOT: RateSnapshot = { ...SNAPSHOT, date: '2026-07-27' };
 
-const PAST_DATE = '2024-03-02';
+const PAST_DATE = EARLIEST_RATE_DATE;
 
 function DatePickerProbe() {
   const { selectDate } = useRates();
@@ -129,16 +133,16 @@ describe('RateHeader', () => {
   it('keeps the snapshot date when a request for another date fails', async () => {
     await renderHeader(
       repositoryReturning(
-        { status: 'ok', snapshot: STALE_SNAPSHOT },
+        { status: 'ok', snapshot: OLDER_SNAPSHOT },
         { status: 'unavailable', reason: 'notFound' },
       ),
     );
 
-    await screen.findByText(`Rates from ${STALE_SNAPSHOT.date}`);
+    await screen.findByText(`Rates from ${OLDER_SNAPSHOT.date}`);
     await fireEvent.press(screen.getByRole('button', { name: 'pick a date' }));
 
     expect(await screen.findByText('No rates were published for that date')).toBeOnTheScreen();
-    expect(screen.getByText(`Rates from ${STALE_SNAPSHOT.date}`)).toBeOnTheScreen();
+    expect(screen.getByText(`Rates from ${OLDER_SNAPSHOT.date}`)).toBeOnTheScreen();
     expect(screen.queryByText(`Rates from ${PAST_DATE}`)).toBeNull();
   });
 });
@@ -150,17 +154,20 @@ describe('RateHeader date selection', () => {
     expect(screen.getByRole('button', { name: 'Change date' })).toBeOnTheScreen();
   });
 
-  it('opens the picker on today when the displayed snapshot is stale', async () => {
-    await renderHeader(repositoryReturning({ status: 'ok', snapshot: STALE_SNAPSHOT }));
+  it('opens the picker on the latest day the provider published, not on the device’s today', async () => {
+    await renderHeader(repositoryReturning({ status: 'ok', snapshot: OLDER_SNAPSHOT }));
 
-    expect(screen.getByRole('button', { name: 'Today' })).toBeOnTheScreen();
+    await screen.findByText(`Rates from ${OLDER_SNAPSHOT.date}`);
     await openPicker();
 
-    expect(screen.getByLabelText(PICKER_LABEL)).toBeOnTheScreen();
-    expect(platformPickerProps(PICKER_LABEL).value).toEqual(toUtcDate(currentRateDate()));
+    const picker = platformPickerProps(PICKER_LABEL);
+
+    expect(picker.value).toEqual(toUtcDate(OLDER_SNAPSHOT.date));
+    expect(picker.maximumDate).toEqual(toUtcDate(OLDER_SNAPSHOT.date));
+    expect(picker.minimumDate).toEqual(toUtcDate(EARLIEST_RATE_DATE));
   }, 60000);
 
-  it('asks for today as `latest`, never as an explicit date', async () => {
+  it('asks for the latest day as `latest`, never as an explicit date', async () => {
     const picked: RateSnapshot = { ...SNAPSHOT, date: PAST_DATE };
     const repository = recordingRepository(
       { status: 'ok', snapshot: SNAPSHOT },
@@ -176,11 +183,11 @@ describe('RateHeader date selection', () => {
     repository.loadLatest.mockClear();
 
     await openPicker();
-    await choose(currentRateDate());
+    await choose(LATEST_DATE);
 
     expect(repository.loadLatest).toHaveBeenCalled();
     expect(repository.loadDate).not.toHaveBeenCalled();
-    expect(screen.queryByRole('button', { name: 'Today' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Latest' })).toBeNull();
   });
 
   it('asks for a past day by its explicit date', async () => {
@@ -237,21 +244,20 @@ describe('RateHeader date selection', () => {
     expect(screen.getByRole('button', { name: 'Close' })).toBeOnTheScreen();
   });
 
-  it('does not offer a future date when the displayed snapshot is ahead', async () => {
-    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-    const ahead: RateSnapshot = { ...SNAPSHOT, date: tomorrow };
+  it('keeps the latest day as the bound once a past date has been picked', async () => {
+    const picked: RateSnapshot = { ...SNAPSHOT, date: PAST_DATE };
 
-    await renderHeader(repositoryReturning({ status: 'ok', snapshot: ahead }));
+    await renderHeader(
+      repositoryReturning({ status: 'ok', snapshot: SNAPSHOT }, { status: 'ok', snapshot: picked }),
+    );
+    await fireEvent.press(screen.getByRole('button', { name: 'pick a date' }));
+    await screen.findByText(`Rates from ${PAST_DATE}`);
     await openPicker();
 
     const picker = platformPickerProps(PICKER_LABEL);
 
-    expect(picker.value).toEqual(toUtcDate(currentRateDate()));
-    expect(picker.maximumDate).toEqual(toUtcDate(currentRateDate()));
-    expect(picker.minimumDate).toBeInstanceOf(Date);
-    expect((picker.minimumDate as Date).getTime()).toBeLessThanOrEqual(
-      (picker.maximumDate as Date).getTime(),
-    );
+    expect(picker.value).toEqual(toUtcDate(PAST_DATE));
+    expect(picker.maximumDate).toEqual(toUtcDate(LATEST_DATE));
   });
 
   it('shows the snapshot that comes back for a picked date', async () => {
@@ -265,21 +271,28 @@ describe('RateHeader date selection', () => {
     expect(await screen.findByText(`Rates from ${PAST_DATE}`)).toBeOnTheScreen();
   });
 
-  it('offers a way back to today only once a past date is showing', async () => {
+  it('offers a way back to the latest rates only once a past date is showing', async () => {
     const picked: RateSnapshot = { ...SNAPSHOT, date: PAST_DATE };
 
     await renderHeader(
       repositoryReturning({ status: 'ok', snapshot: SNAPSHOT }, { status: 'ok', snapshot: picked }),
     );
 
-    expect(screen.queryByRole('button', { name: 'Today' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Latest' })).toBeNull();
 
     await fireEvent.press(screen.getByRole('button', { name: 'pick a date' }));
 
-    expect(await screen.findByRole('button', { name: 'Today' })).toBeOnTheScreen();
+    expect(await screen.findByRole('button', { name: 'Latest' })).toBeOnTheScreen();
   });
 
-  it('returns to today, and to today’s snapshot, when asked', async () => {
+  it('offers no way back to the latest rates while the day it published is behind today', async () => {
+    await renderHeader(repositoryReturning({ status: 'ok', snapshot: OLDER_SNAPSHOT }));
+
+    expect(await screen.findByText(`Rates from ${OLDER_SNAPSHOT.date}`)).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Latest' })).toBeNull();
+  });
+
+  it('returns to the latest rates, and to their snapshot, when asked', async () => {
     const picked: RateSnapshot = { ...SNAPSHOT, date: PAST_DATE };
 
     await renderHeader(
@@ -288,9 +301,43 @@ describe('RateHeader date selection', () => {
     await fireEvent.press(screen.getByRole('button', { name: 'pick a date' }));
     await screen.findByText(`Rates from ${PAST_DATE}`);
 
-    await fireEvent.press(screen.getByRole('button', { name: 'Today' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Latest' }));
 
     expect(await screen.findByText(`Rates from ${SNAPSHOT.date}`)).toBeOnTheScreen();
-    expect(screen.queryByRole('button', { name: 'Today' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Latest' })).toBeNull();
+  });
+});
+
+describe('RateHeader while the rates are stale', () => {
+  const OFFLINE: SnapshotOutcome = {
+    status: 'stale',
+    snapshot: SNAPSHOT,
+    reason: 'networkError',
+  };
+
+  it('hides the way to change the date, because no other day could be fetched either', async () => {
+    await renderHeader(repositoryReturning(OFFLINE));
+
+    expect(await screen.findByText('Offline — showing the last rates saved')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Change date' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeOnTheScreen();
+  });
+
+  it('closes a picker that was already open when the rates went stale', async () => {
+    const sendAppState = trackAppState();
+    const loadLatest = jest
+      .fn<Promise<SnapshotOutcome>, []>()
+      .mockResolvedValueOnce({ status: 'ok', snapshot: SNAPSHOT })
+      .mockResolvedValue(OFFLINE);
+
+    await renderHeader({ loadLatest, loadDate: () => Promise.resolve(OFFLINE) });
+    await openPicker();
+
+    expect(screen.getByLabelText(PICKER_LABEL)).toBeOnTheScreen();
+
+    await sendAppState('active');
+
+    expect(screen.queryByLabelText(PICKER_LABEL)).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Change date' })).toBeNull();
   });
 });

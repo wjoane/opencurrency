@@ -28,7 +28,7 @@
   "converter.moveDownLabel": "Flytta {currency} ned",
   "date.change": "Ändra datum",
   "date.label": "Kursdatum",
-  "date.today": "I dag",
+  "date.latest": "Senaste",
   "rates.midMarket": "Mittkurser",
   "rates.info.title": "Om dessa kurser",
   "rates.info.basis": "Belopp räknas om till dagens mittkurs, mittpunkten mellan köp- och säljkurs, före avgifter och marginal.",
