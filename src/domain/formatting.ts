@@ -16,6 +16,7 @@ import { decimalExponent, type MoneyAmount, toFixedDecimalString } from './money
 export interface AmountFormatOptions {
   readonly currencyCode: string;
   readonly locale: string;
+  readonly showSymbol: boolean;
 }
 
 const DECIMAL_POINT = '.';
@@ -81,7 +82,7 @@ export function formatAmount(amount: MoneyAmount, options: AmountFormatOptions):
     options.locale,
   );
 
-  const symbol = getSymbol(options.currencyCode) ?? '';
+  const symbol = options.showSymbol ? (getSymbol(options.currencyCode) ?? '') : '';
   if (symbol === '') {
     return number;
   }

@@ -1453,7 +1453,7 @@
       "name": "Gold Ounce",
       "rate": 0.00028518504,
       "minorUnits": null,
-      "symbol": "oz",
+      "symbol": "oz ",
       "countryCode": null,
       "isIso4217": true
     },

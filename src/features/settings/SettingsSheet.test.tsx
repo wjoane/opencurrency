@@ -1,25 +1,40 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { Alert, Linking } from 'react-native';
 
+import { type PreferencesStore } from '../../data/preferencesStorage';
 import { I18nProvider } from '../../i18n/I18nContext';
 import * as direction from '../../i18n/direction';
+import { PreferencesProvider } from '../../state/PreferencesContext';
 import { ThemeProvider } from '../../theme/ThemeContext';
 
 import { SettingsSheet } from './SettingsSheet';
 
 jest.mock('expo-localization', () => ({ getLocales: () => [{ languageTag: 'en-GB' }] }));
 
+function storeReturning(serialised: string | null): PreferencesStore {
+  return { read: () => Promise.resolve(serialised), write: () => Promise.resolve() };
+}
+
 async function renderSheet(
   initialLocale: string | null = 'en',
   onLocaleChange?: (locale: string | null) => void,
+  store: PreferencesStore = storeReturning(null),
 ) {
   await render(
-    <ThemeProvider initialPreference="system">
-      <I18nProvider initialLocale={initialLocale ?? undefined} onLocaleChange={onLocaleChange}>
-        <SettingsSheet visible onClose={() => {}} />
-      </I18nProvider>
-    </ThemeProvider>,
+    <PreferencesProvider store={store}>
+      <ThemeProvider initialPreference="system">
+        <I18nProvider initialLocale={initialLocale ?? undefined} onLocaleChange={onLocaleChange}>
+          <SettingsSheet visible onClose={() => {}} />
+        </I18nProvider>
+      </ThemeProvider>
+    </PreferencesProvider>,
   );
+
+  await act(async () => {});
+}
+
+function toggle(name: string) {
+  return screen.getByRole('switch', { name });
 }
 
 function option(name: string) {
@@ -45,7 +60,50 @@ describe('SettingsSheet', () => {
     expect(appearance('System')).toBeChecked();
     expect(appearance('Light')).not.toBeChecked();
     expect(appearance('Dark')).not.toBeChecked();
-    expect(screen.queryAllByRole('switch')).toHaveLength(0);
+    expect(screen.queryByRole('switch', { name: 'System' })).toBeNull();
+  });
+
+  it('offers the display choices off, as switches rather than a further mode list', async () => {
+    await renderSheet();
+
+    expect(toggle('Currency symbols')).not.toBeChecked();
+    expect(toggle('Conversion rates')).not.toBeChecked();
+    expect(screen.queryByRole('radio', { name: 'Currency symbols' })).toBeNull();
+  });
+
+  it('switches each display choice independently of the other', async () => {
+    await renderSheet();
+
+    await fireEvent(toggle('Currency symbols'), 'valueChange', true);
+
+    expect(toggle('Currency symbols')).toBeChecked();
+    expect(toggle('Conversion rates')).not.toBeChecked();
+
+    await fireEvent(toggle('Conversion rates'), 'valueChange', true);
+    await fireEvent(toggle('Currency symbols'), 'valueChange', false);
+
+    expect(toggle('Currency symbols')).not.toBeChecked();
+    expect(toggle('Conversion rates')).toBeChecked();
+  });
+
+  it('restores the switches from what was persisted', async () => {
+    await renderSheet(
+      'en',
+      undefined,
+      storeReturning(JSON.stringify({ showConversionRates: true })),
+    );
+
+    expect(toggle('Currency symbols')).not.toBeChecked();
+    expect(toggle('Conversion rates')).toBeChecked();
+  });
+
+  it('translates the display switches with the rest of the sheet', async () => {
+    await renderSheet();
+    await openLanguageDropdown();
+    await fireEvent.press(option('Français'));
+
+    expect(toggle('Symboles monétaires')).toBeOnTheScreen();
+    expect(toggle('Taux de conversion')).toBeOnTheScreen();
   });
 
   it('changes the appearance directly from the three-way selection', async () => {

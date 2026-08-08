@@ -16,6 +16,8 @@ function build(overrides: Partial<CurrencyRowsInput> = {}) {
     rates: RATES,
     locale: 'en',
     t,
+    showCurrencySymbols: true,
+    showConversionRates: true,
     ...overrides,
   });
 }
@@ -69,6 +71,22 @@ describe('buildCurrencyRows', () => {
     const rows = build({ currencyCodes: ['eur', 'btc'] });
 
     expect(row(rows, 'btc').rateText).toBe('1 EUR = 0.0000094 BTC');
+  });
+
+  it('drops the symbol from every amount when symbols are hidden', () => {
+    const rows = build({ showCurrencySymbols: false, formatActiveAmount: true });
+
+    expect(row(rows, 'usd').amountText).toBe('108.42');
+    expect(row(rows, 'jpy').amountText).toBe('16,523');
+    expect(row(rows, 'eur').amountText).toBe('100.00');
+    expect(row(rows, 'eur').placeholderAmountText).toBe('100.00');
+    expect(row(rows, 'usd').accessibilityLabel).toContain('108.42');
+  });
+
+  it('says nothing on any row when the rates are hidden', () => {
+    const rows = build({ showConversionRates: false });
+
+    expect(rows.map((model) => model.rateText)).toEqual([null, null, null]);
   });
 
   it('marks exactly one row active', () => {

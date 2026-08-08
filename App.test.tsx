@@ -54,6 +54,18 @@ describe('App', () => {
 
     await screen.findByText('Rates from 2026-07-27');
 
+    expect(screen.getByText('1.08')).toBeOnTheScreen();
+  });
+
+  it('carries a display switch through to the rows it formats', async () => {
+    await render(<App />);
+
+    await screen.findByText('Rates from 2026-07-27');
+    await fireEvent.press(screen.getByRole('button', { name: 'Settings' }));
+    await fireEvent(screen.getByRole('switch', { name: 'Currency symbols' }), 'valueChange', true);
+    await fireEvent(screen.getByRole('switch', { name: 'Conversion rates' }), 'valueChange', true);
+    await fireEvent.press(screen.getByRole('button', { name: 'Close' }));
+
     expect(screen.getByText('$1.08')).toBeOnTheScreen();
     expect(screen.getByText('1 EUR = 1.0842 USD')).toBeOnTheScreen();
   });

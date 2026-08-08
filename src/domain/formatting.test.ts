@@ -13,8 +13,11 @@ function amount(value: number | string): MoneyAmount {
   return parsed;
 }
 
-function format(value: number | string, options: AmountFormatOptions): string {
-  return formatAmount(amount(value), options);
+function format(
+  value: number | string,
+  options: Omit<AmountFormatOptions, 'showSymbol'> & { readonly showSymbol?: boolean },
+): string {
+  return formatAmount(amount(value), { showSymbol: true, ...options });
 }
 
 describe('formatAmount precision', () => {
@@ -91,6 +94,16 @@ describe('formatAmount symbols', () => {
     expect(format(1, { currencyCode: '1inch', locale: 'en' })).toBe('1');
   });
 
+  it('omits the symbol, and its separator, when the caller does not want one', () => {
+    expect(format(1234.5, { currencyCode: 'usd', locale: 'en', showSymbol: false })).toBe(
+      '1,234.50',
+    );
+    expect(format(1234.5, { currencyCode: 'eur', locale: 'de', showSymbol: false })).toBe(
+      '1.234,50',
+    );
+    expect(format(1234.5, { currencyCode: 'jpy', locale: 'en', showSymbol: false })).toBe('1,235');
+  });
+
   it('puts the symbol after the number when the locale requires it', () => {
     expect(format(1234.5, { currencyCode: 'eur', locale: 'de' })).toBe(
       `1.234,50${NON_BREAKING_SPACE}€`,
@@ -154,7 +167,9 @@ describe('formatAmount grouping', () => {
 describe('formatRate', () => {
   it('keeps decimals a zero-minor-unit currency would have rounded away', () => {
     expect(formatRate(amount('152.31'), 'en')).toBe('152.31');
-    expect(formatAmount(amount('152.31'), { currencyCode: 'jpy', locale: 'en' })).toBe('¥152');
+    expect(
+      formatAmount(amount('152.31'), { currencyCode: 'jpy', locale: 'en', showSymbol: true }),
+    ).toBe('¥152');
   });
 
   it('adapts to a rate small enough that two decimals would show zero', () => {

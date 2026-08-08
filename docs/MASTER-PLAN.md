@@ -39,8 +39,11 @@ currently provides:
   and metal codes.
 - Currency addition, deletion, and drag reordering, with a minimum of two rows;
   amount editing accepts either decimal separator and keeps the active input raw.
-- Persisted preferences for currencies, order, amount, active currency, theme, and
-  language, with light/dark/system themes and live RTL layout mirroring.
+- Persisted preferences for currencies, order, amount, active currency, theme,
+  language, and the two display switches, with light/dark/system themes and live RTL
+  layout mirroring.
+- Optional, off-by-default display of currency symbols on amounts and of the
+  conversion-rate sub-line under each row.
 - A typed hand-rolled localisation layer covering 27 locales, native date picking
   with a web fallback, accessibility labels, branded assets, and a comprehensive
   Jest/React Native Testing Library suite.
@@ -78,10 +81,11 @@ Conventions:
 | M04 | Rates and the converter screen | ✅ Complete | — |
 | M05 | Currency management and historical dates | ✅ Complete | — |
 | M06 | Localisation, settings, polish and release | ✅ Implementation complete (release build pending) | — |
+| M07 | Display settings | ✅ Complete | [M07-display-settings.md](./M07-display-settings.md) |
 
-The implementation was delivered as one completed feature change after the initial
-environment and planning work. The milestone split remains as a historical index of
-the workstreams; no milestone is still awaiting implementation.
+M01–M06 were delivered as one completed feature change after the initial environment
+and planning work. The milestone split remains as a historical index of the
+workstreams; no milestone is still awaiting implementation.
 
 **Ordering rationale.** M03 front-loaded the pure domain layer and runtime capability
 checks because the money representation constrains every screen and Hermes's partial
@@ -145,7 +149,7 @@ Free, no API key, no rate limits, no attribution requirement.
 | 16 | Currency metadata | **Shipped tables**: minor units, symbols, and currency→ISO-3166 country | The provider supplies none of it — `currencies.json` is code→name and nothing else. |
 | 17 | Formatting | Grouping is applied to the **decimal string**, never via `Number`. `Intl` is used to read the locale's group and decimal separators and its currency-symbol placement; shipped fallbacks cover all supported locales | Converting a `big.js` value to `Number` to format it discards the precision the type exists to protect. `Intl.NumberFormat` is probed with a valid ISO currency solely for its locale layout; the shipped symbol is then placed around the exact decimal string. Provider codes such as `1INCH` are never passed to `Intl`, avoiding its three-letter currency-code restriction. |
 | 18 | Digits | **Latin digits in all locales** | CLDR's default numbering system for `ar` is Arabic-Indic (`١٢٣`). Since amounts are rendered from our own decimal string, Latin digits are what we emit unless we deliberately transliterate. Matches the convention of most Arabic-locale finance apps. |
-| 19 | Symbols | Shipped code→symbol map, falling back to the **uppercase code** | Never wrong, and the row already carries a short-identifier column, so the fallback is not a visible failure. |
+| 19 | Symbols | Shipped code→symbol map, falling back to the **uppercase code**. Decorating an amount with its symbol is **opt-in and off by default** (M07); `formatAmount` takes a required `showSymbol` and omits the symbol together with its locale separator | Never wrong, and the row already carries a short-identifier column, so the fallback is not a visible failure — which is also why the symbol can default to hidden without rows becoming ambiguous. Keeping the switch inside `formatAmount` keeps the one place that knows a locale's symbol spacing responsible for removing it. |
 
 ### 4.5 State, storage and offline
 
@@ -155,7 +159,7 @@ Free, no API key, no rate limits, no attribution requirement.
 | 21 | Storage engine | AsyncStorage | Effectively forced — MMKV requires custom native code, which would break the Expo Go device-testing setup from M01. Backed by `localStorage` on web. |
 | 22 | Storage layout | **One key per date** (`rates:v1:YYYY-MM-DD`) plus an index key. Write-recency cap of **180 snapshots** (~1 MB), newest always pinned; cache reads do not rewrite the index | A single blob would be rewritten in full on every fetch, and would eventually exceed the web `localStorage` quota. Avoiding index writes on reads also prevents historical browsing from causing persistent-storage churn. |
 | 23 | State management | **React Context + `useReducer`**; domain logic in plain TS with no React imports | Two providers (preferences, rates). The load-bearing case is amount editing, which re-renders ~10 memoised rows per keystroke — not a real cost at this scale. Keeps the conversion rules unit-testable without rendering, as `AGENTS.md` requires. |
-| 24 | Persisted across launches | Theme, language, currency list and order, last amount and active currency. **Not** the selected date | A past date silently surviving a cold start would show old rates without the user having asked for them. |
+| 24 | Persisted across launches | Theme, language, currency list and order, last amount and active currency, and the two display switches. **Not** the selected date | A past date silently surviving a cold start would show old rates without the user having asked for them. Everything else is a stated preference, so re-asking for it on every launch would be the surprising behaviour. |
 | 25 | Offline / stale | The newest cached snapshot stays on screen with an explicit stale indicator | Conversion must work offline. Staleness is surfaced, never hidden. |
 | 26 | Failed historical fetch | Keeps the current snapshot and the current header date, and surfaces an explicit error. **Never substitutes another date's rates** | Silently showing a different day's rates is a correctness bug dressed up as resilience. |
 | 27 | Cold start | Ship generated `app-data.json`, grouped by currency: name, EUR rate, minor units, symbol, resolved country code and availability, from the **2026-08-01** snapshot | Makes first launch fully usable offline from one validated data asset. The rate snapshot carries its provider date, is rendered as that date, and is only the fallback while the normal latest-rate refresh remains unavailable; it is never represented as current data. |
@@ -167,7 +171,7 @@ Free, no API key, no rate limits, no attribution requirement.
 | 28 | Navigation | **Single screen + modals, no router** | There is one screen; add-currency, settings and the date picker are transient surfaces. `expo-router` and React Navigation both restructure the repo to serve a single screen. |
 | 29 | Styling | **`StyleSheet` + `ThemeContext`** design tokens | Zero dependencies, identical on web, and does not impose a Material look on a minimalistic brief. |
 | 30 | Themes | Light / dark / **system (default)** | Requires `app.json` `userInterfaceStyle` to change from `"light"` to `"automatic"`; otherwise iOS is pinned to light and `useColorScheme()` never reports dark. |
-| 31 | Rate sub-line | The rate **against the active input currency** — `1 USD = 152.31 JPY`. The active row shows its EUR reference rate instead | It is the rate that produced the number directly above it, which is what "the used exchange rate" means. Always showing the EUR rate would display a rate that was not used whenever the input is not EUR. |
+| 31 | Rate sub-line | The rate **against the active input currency** — `1 USD = 152.31 JPY`. **Opt-in and off by default** (M07); the active row never carries one | It is the rate that produced the number directly above it, which is what "the used exchange rate" means. Quoting against EUR instead would display a rate that was not used whenever the input is not EUR. Defaulting it off keeps the converter to the numbers it exists to give; the rate is reference information the user can ask for. |
 | 32 | Amount input | **Raw text while active** — no live grouping — formatted when inactive. Both `.` and `,` accepted as the decimal separator; the first one typed wins | Live reformatting rewrites the string on every keystroke, and React Native offers no reliable cross-platform cursor control, which is a known source of jumping-cursor bugs. Accepting both separators matters because a German keyboard offers `,` while an iOS numeric keypad may offer `.`. |
 | 33 | Reordering | **`react-native-reorderable-list`** (Reanimated 4) | `react-native-draggable-flatlist` is the better-known library but was last published 2025-05-06 and predates Reanimated 4, which SDK 57 ships. Chosen over hand-rolling because it also supplies auto-scroll. |
 | 34 | Date picker | `@react-native-community/datetimepicker` + a `.web.tsx` sibling rendering `<input type="date">` | Native feel on both shipping platforms. The package has no web implementation, and Metro's platform-extension resolution keeps the fallback out of the native bundle. |

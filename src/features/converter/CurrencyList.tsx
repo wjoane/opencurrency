@@ -40,7 +40,8 @@ export interface CurrencyListProps {
 export function CurrencyList({ footer, rates }: CurrencyListProps) {
   const { preferences, updatePreferences } = usePreferences();
   const { locale, t } = useI18n();
-  const { activeCurrencyCode, currencyCodes } = preferences;
+  const { activeCurrencyCode, currencyCodes, showCurrencySymbols, showConversionRates } =
+    preferences;
   const styles = useThemedStyles(createStyles);
   const reorderPanGesture = useMemo(
     () => Gesture.Pan().activateAfterLongPress(REORDER_PAN_ACTIVATION_DURATION),
@@ -59,6 +60,8 @@ export function CurrencyList({ footer, rates }: CurrencyListProps) {
         rates,
         locale,
         t,
+        showCurrencySymbols,
+        showConversionRates,
       }),
     [
       currencyCodes,
@@ -68,6 +71,8 @@ export function CurrencyList({ footer, rates }: CurrencyListProps) {
       rates,
       locale,
       t,
+      showCurrencySymbols,
+      showConversionRates,
     ],
   );
   const rowsRef = useRef(rows);

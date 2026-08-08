@@ -31,6 +31,8 @@ export interface CurrencyRowsInput {
   readonly rates: RateTable;
   readonly locale: string;
   readonly t: Translate;
+  readonly showCurrencySymbols: boolean;
+  readonly showConversionRates: boolean;
 }
 
 const ONE = one();
@@ -38,12 +40,11 @@ const ONE = one();
 function buildRateText(
   currencyCode: string,
   isActive: boolean,
-  activeCurrencyCode: string,
-  rates: RateTable,
-  locale: string,
-  t: Translate,
+  input: CurrencyRowsInput,
 ): string | null {
-  if (isActive) {
+  const { activeCurrencyCode, rates, locale, t } = input;
+
+  if (isActive || !input.showConversionRates) {
     return null;
   }
 
@@ -72,7 +73,7 @@ function buildRow(currencyCode: string, input: CurrencyRowsInput): CurrencyRowMo
   const formatted =
     converted === null
       ? t('converter.unavailableAmount')
-      : formatAmount(converted, { currencyCode, locale });
+      : formatAmount(converted, { currencyCode, locale, showSymbol: input.showCurrencySymbols });
 
   const currencyName = getCurrencyName(currencyCode, locale);
   const displayed = isActive && !input.formatActiveAmount ? amountText : formatted;
@@ -85,7 +86,7 @@ function buildRow(currencyCode: string, input: CurrencyRowsInput): CurrencyRowMo
     amountText: displayed,
     placeholderAmountText: formatted,
     editableAmountText: converted === null ? '' : toDisplayDecimalString(converted, currencyCode),
-    rateText: buildRateText(currencyCode, isActive, activeCurrencyCode, rates, locale, t),
+    rateText: buildRateText(currencyCode, isActive, input),
     isActive,
     isAmountFormatted: isActive && input.formatActiveAmount,
     accessibilityLabel: t('converter.rowLabel', { currency: currencyName, amount: displayed }),

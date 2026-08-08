@@ -11,6 +11,8 @@ export interface Preferences {
   readonly currencyCodes: readonly string[];
   readonly activeCurrencyCode: string;
   readonly amountText: string;
+  readonly showCurrencySymbols: boolean;
+  readonly showConversionRates: boolean;
 }
 
 const DEFAULT_PREFERENCES: Preferences = {
@@ -19,6 +21,8 @@ const DEFAULT_PREFERENCES: Preferences = {
   currencyCodes: ['eur', 'usd'],
   activeCurrencyCode: 'eur',
   amountText: '1',
+  showCurrencySymbols: false,
+  showConversionRates: false,
 };
 
 export const MINIMUM_CURRENCY_ROWS = 2;
@@ -58,12 +62,18 @@ function readAmountText(value: unknown): string {
   return typeof value === 'string' ? value : DEFAULT_PREFERENCES.amountText;
 }
 
+function readFlag(value: unknown, fallback: boolean): boolean {
+  return typeof value === 'boolean' ? value : fallback;
+}
+
 export function normalisePreferences(preferences: Preferences): Preferences {
   return {
     theme: preferences.theme,
     language: preferences.language,
     ...normaliseCurrencySelection(preferences.currencyCodes, preferences.activeCurrencyCode),
     amountText: preferences.amountText,
+    showCurrencySymbols: preferences.showCurrencySymbols,
+    showConversionRates: preferences.showConversionRates,
   };
 }
 
@@ -97,6 +107,14 @@ export function parsePreferences(serialised: string | null): Preferences {
     language: readLanguage(document.language),
     ...normaliseCurrencySelection(storedCodes, activeCurrencyCode),
     amountText: readAmountText(document.amountText),
+    showCurrencySymbols: readFlag(
+      document.showCurrencySymbols,
+      DEFAULT_PREFERENCES.showCurrencySymbols,
+    ),
+    showConversionRates: readFlag(
+      document.showConversionRates,
+      DEFAULT_PREFERENCES.showConversionRates,
+    ),
   };
 }
 

@@ -20,6 +20,11 @@ function storeReturning(serialised: string | null): PreferencesStore {
   return { read: () => Promise.resolve(serialised), write: () => Promise.resolve() };
 }
 
+const SHOWING_SYMBOLS_AND_RATES = JSON.stringify({
+  showCurrencySymbols: true,
+  showConversionRates: true,
+});
+
 function repositoryReturning(outcome: SnapshotOutcome): RateRepository {
   return { loadLatest: () => Promise.resolve(outcome), loadDate: () => Promise.resolve(outcome) };
 }
@@ -83,8 +88,8 @@ describe('ConverterScreen', () => {
     await renderScreen();
 
     expect(activeAmountField('Euro').props.value).toBe('');
-    expect(activeAmountField('Euro').props.placeholder).toBe('€1.00');
-    expect(screen.getByText('$1.08')).toBeOnTheScreen();
+    expect(activeAmountField('Euro').props.placeholder).toBe('1.00');
+    expect(screen.getByText('1.08')).toBeOnTheScreen();
   });
 
   it('converts every other row when the active amount is edited', async () => {
@@ -92,7 +97,7 @@ describe('ConverterScreen', () => {
 
     await fireEvent.changeText(activeAmountField('Euro'), '250');
 
-    expect(screen.getByText('$271.05')).toBeOnTheScreen();
+    expect(screen.getByText('271.05')).toBeOnTheScreen();
   });
 
   it('leaves the active row unformatted while it is being typed in', async () => {
@@ -110,7 +115,7 @@ describe('ConverterScreen', () => {
     await fireEvent(activeAmountField('Euro'), 'endEditing');
 
     expect(activeAmountField('Euro').props.value).toBe('');
-    expect(activeAmountField('Euro').props.placeholder).toBe('€1,234,567.80');
+    expect(activeAmountField('Euro').props.placeholder).toBe('1,234,567.80');
   });
 
   it('moves the input to another row when that row is pressed', async () => {
@@ -146,7 +151,7 @@ describe('ConverterScreen', () => {
     await fireEvent.press(screen.getByLabelText(/^US Dollar,/));
 
     expect(activeAmountField('US Dollar').props.value).toBe('');
-    expect(activeAmountField('US Dollar').props.placeholder).toBe('$271.05');
+    expect(activeAmountField('US Dollar').props.placeholder).toBe('271.05');
   });
 
   it('converts back the other way once another row is active', async () => {
@@ -155,17 +160,45 @@ describe('ConverterScreen', () => {
     await fireEvent.press(screen.getByLabelText(/^US Dollar,/));
     await fireEvent.changeText(activeAmountField('US Dollar'), '100');
 
-    expect(screen.getByText('€92.23')).toBeOnTheScreen();
+    expect(screen.getByText('92.23')).toBeOnTheScreen();
   });
 
   it('quotes the rate sub-line against whichever row is active', async () => {
-    await renderScreen();
+    await renderScreen({ store: storeReturning(SHOWING_SYMBOLS_AND_RATES) });
 
     expect(screen.getByText('1 EUR = 1.0842 USD')).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByLabelText(/^US Dollar,/));
 
     expect(screen.getByText('1 USD = 0.92233905 EUR')).toBeOnTheScreen();
+  });
+
+  it('hides the symbols and the rate sub-lines until they are switched on', async () => {
+    await renderScreen();
+
+    expect(screen.getByText('1.08')).toBeOnTheScreen();
+    expect(screen.queryByText('$1.08')).toBeNull();
+    expect(screen.queryByText('1 EUR = 1.0842 USD')).toBeNull();
+  });
+
+  it('shows the symbols and the rate sub-lines once they are switched on', async () => {
+    await renderScreen({ store: storeReturning(SHOWING_SYMBOLS_AND_RATES) });
+
+    expect(screen.getByText('$1.08')).toBeOnTheScreen();
+    expect(activeAmountField('Euro').props.placeholder).toBe('€1.00');
+    expect(screen.getByText('1 EUR = 1.0842 USD')).toBeOnTheScreen();
+  });
+
+  it('applies a display switch to the rows without leaving the screen', async () => {
+    await renderScreen();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Settings' }));
+    await fireEvent(screen.getByRole('switch', { name: 'Currency symbols' }), 'valueChange', true);
+    await fireEvent(screen.getByRole('switch', { name: 'Conversion rates' }), 'valueChange', true);
+    await fireEvent.press(screen.getByRole('button', { name: 'Close' }));
+
+    expect(screen.getByText('$1.08')).toBeOnTheScreen();
+    expect(screen.getByText('1 EUR = 1.0842 USD')).toBeOnTheScreen();
   });
 
   it('marks the active row with an accessibility state, not colour alone', async () => {
@@ -188,8 +221,8 @@ describe('ConverterScreen', () => {
       ),
     });
 
-    expect(activeAmountField('Japanese Yen').props.placeholder).toBe('¥1,000');
-    expect(screen.getByText('€6.05')).toBeOnTheScreen();
+    expect(activeAmountField('Japanese Yen').props.placeholder).toBe('1,000');
+    expect(screen.getByText('6.05')).toBeOnTheScreen();
   });
 
   it('says the rates are stale rather than hiding it', async () => {
@@ -213,7 +246,7 @@ describe('ConverterScreen', () => {
     expect(screen.getByText('Rates from 2026-08-01')).toBeOnTheScreen();
     expect(screen.getByText('Could not reach the rate provider')).toBeOnTheScreen();
     expect(screen.getByLabelText(/^US Dollar,/)).toBeOnTheScreen();
-    expect(screen.getByText('$1.15')).toBeOnTheScreen();
+    expect(screen.getByText('1.15')).toBeOnTheScreen();
   });
 });
 
@@ -278,8 +311,8 @@ describe('ConverterScreen currency management', () => {
 
     await pressRemove('Remove Japanese Yen');
 
-    expect(activeAmountField('Euro').props.placeholder).toBe('€0.61');
-    expect(screen.getByText('$0.66')).toBeOnTheScreen();
+    expect(activeAmountField('Euro').props.placeholder).toBe('0.61');
+    expect(screen.getByText('0.66')).toBeOnTheScreen();
   });
 
   it('keeps the two-row minimum when three deletion animations are requested together', async () => {
@@ -424,7 +457,7 @@ describe('ConverterScreen currency management', () => {
 
     expect(screen.getByLabelText(/^Japanese Yen,/)).toBeOnTheScreen();
 
-    expect(screen.getByText('¥165')).toBeOnTheScreen();
+    expect(screen.getByText('165')).toBeOnTheScreen();
   });
 
   it('appends a new currency without changing the existing list order', async () => {

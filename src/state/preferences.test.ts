@@ -20,6 +20,8 @@ describe('parsePreferences', () => {
       currencyCodes: ['eur', 'usd', 'jpy'],
       activeCurrencyCode: 'jpy',
       amountText: '12,5',
+      showCurrencySymbols: true,
+      showConversionRates: true,
     } as const;
 
     expect(parsePreferences(serialisePreferences(preferences))).toEqual(preferences);
@@ -32,6 +34,7 @@ describe('parsePreferences', () => {
       currencyCodes: ['eur', 'gbp'],
       activeCurrencyCode: 'gbp',
       amountText: 42,
+      showCurrencySymbols: 'yes',
     });
 
     expect(parsePreferences(stored)).toEqual({
@@ -40,6 +43,17 @@ describe('parsePreferences', () => {
       currencyCodes: ['eur', 'gbp'],
       activeCurrencyCode: 'gbp',
       amountText: DEFAULT_PREFERENCES.amountText,
+      showCurrencySymbols: false,
+      showConversionRates: false,
+    });
+  });
+
+  it('hides the symbols and the rates until they are asked for', () => {
+    expect(DEFAULT_PREFERENCES.showCurrencySymbols).toBe(false);
+    expect(DEFAULT_PREFERENCES.showConversionRates).toBe(false);
+    expect(parsePreferences(JSON.stringify({ showConversionRates: true }))).toMatchObject({
+      showCurrencySymbols: false,
+      showConversionRates: true,
     });
   });
 
@@ -113,6 +127,8 @@ describe('normalisePreferences', () => {
       'amountText',
       'currencyCodes',
       'language',
+      'showConversionRates',
+      'showCurrencySymbols',
       'theme',
     ]);
   });

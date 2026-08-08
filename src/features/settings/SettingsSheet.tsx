@@ -1,12 +1,13 @@
 /** Renders appearance, language, and application information settings. */
 
 import { useCallback, useState } from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 
 import { SUPPORTED_LOCALES, type Translate, type TranslationKey } from '../../i18n';
 import { useI18n } from '../../i18n/I18nContext';
 import { reconcileDirection } from '../../i18n/direction';
 import { getEndonym, getLayoutDirection } from '../../i18n/locales';
+import { usePreferences } from '../../state/PreferencesContext';
 import { useTheme } from '../../theme/ThemeContext';
 import { type ThemePreference } from '../../theme/ThemeContext';
 import { type ThemeTokens } from '../../theme/tokens';
@@ -39,6 +40,7 @@ const APPEARANCE_CHOICES: readonly {
 export function SettingsSheet({ visible, onClose }: SettingsSheetProps) {
   const { theme, preference, setPreference } = useTheme();
   const { locale, followsDevice, t, setLocale } = useI18n();
+  const { preferences, updatePreferences } = usePreferences();
   const styles = useThemedStyles(createStyles);
   const [languageExpanded, setLanguageExpanded] = useState(false);
   const [aboutVisible, setAboutVisible] = useState(false);
@@ -65,6 +67,22 @@ export function SettingsSheet({ visible, onClose }: SettingsSheetProps) {
           {t('settings.appearance')}
         </Text>
         <AppearanceSelector preference={preference} onChange={setPreference} t={t} />
+
+        <Text style={styles.sectionTitle} accessibilityRole="header">
+          {t('settings.display')}
+        </Text>
+        <View style={styles.toggleGroup}>
+          <ToggleRow
+            label={t('settings.display.symbols')}
+            value={preferences.showCurrencySymbols}
+            onChange={(showCurrencySymbols) => updatePreferences({ showCurrencySymbols })}
+          />
+          <ToggleRow
+            label={t('settings.display.rates')}
+            value={preferences.showConversionRates}
+            onChange={(showConversionRates) => updatePreferences({ showConversionRates })}
+          />
+        </View>
 
         <Text style={styles.sectionTitle} accessibilityRole="header">
           {t('settings.language')}
@@ -173,6 +191,29 @@ function AppearanceSelector({ preference, onChange, t }: AppearanceSelectorProps
   );
 }
 
+interface ToggleRowProps {
+  readonly label: string;
+  readonly value: boolean;
+  readonly onChange: (value: boolean) => void;
+}
+
+function ToggleRow({ label, value, onChange }: ToggleRowProps) {
+  const { theme } = useTheme();
+  const styles = useThemedStyles(createStyles);
+
+  return (
+    <View style={styles.toggleRow}>
+      <Text style={styles.toggleLabel}>{label}</Text>
+      <Switch
+        value={value}
+        onValueChange={onChange}
+        accessibilityLabel={label}
+        trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+      />
+    </View>
+  );
+}
+
 interface ChoiceProps {
   readonly label: string;
   readonly selected: boolean;
@@ -260,6 +301,26 @@ function createStyles(theme: ThemeTokens) {
     appearanceChoiceLabelSelected: {
       color: theme.colors.onEmphasis,
       fontWeight: '600',
+    },
+    toggleGroup: {
+      paddingHorizontal: theme.spacing.md,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: theme.colors.border,
+      borderRadius: theme.radii.md,
+      backgroundColor: theme.colors.surface,
+    },
+    toggleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: theme.spacing.md,
+      minHeight: 44,
+      paddingVertical: theme.spacing.sm,
+    },
+    toggleLabel: {
+      ...theme.typography.body,
+      color: theme.colors.textPrimary,
+      flexShrink: 1,
     },
     dropdownTrigger: {
       flexDirection: 'row',

@@ -41,7 +41,7 @@ exchange services.
 | **Multi-currency input** | Type into any currency row and compare every selected currency at once. |
 | **Historical and offline rates** | Choose a supported past date; snapshots are cached per date and remain usable offline. |
 | **Money you can trust** | Conversion and formatting use exact decimal arithmetic, ISO minor units, and validated provider responses. |
-| **Made for everyday use** | Add, remove, and reorder currencies; choose light, dark, or system theme. |
+| **Made for everyday use** | Add, remove, and reorder currencies; choose light, dark, or system theme; switch currency symbols and conversion rates on when you want them. |
 | **Global by design** | Full UI translation for 27 locales, including live right-to-left layout mirroring. |
 | **Open and private** | No account, API key, or proprietary backend is needed. |
 
