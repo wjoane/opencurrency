@@ -2,7 +2,7 @@
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "entry": ["App.tsx", "**/*.test.{ts,tsx}"],
   "project": ["**/*.{ts,tsx}"],
-  "ignoreDependencies": ["expo-system-ui"],
+  "ignoreDependencies": ["expo-system-ui", "@expo/ngrok"],
   "babel": {
     "config": ["babel.config.js"]
   }

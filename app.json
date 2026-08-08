@@ -10,7 +10,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "me.wjoane.opencurrency",
       "infoPlist": {
-        "ExpoLocalization_supportsRTL": true
+        "ExpoLocalization_supportsRTL": true,
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {

@@ -103,7 +103,8 @@ localisation, settings, polish, and release configuration.
 | Language | TypeScript, `strict: true` |
 | Runtime | React Native 0.86, React 19.2 |
 | Dev environment | Fully containerised; host needs only docker, docker-compose, git |
-| Device testing | Expo Go over LAN, via `network_mode: host` |
+| Device testing | Expo Go over LAN, via `network_mode: host`; off-LAN via `make tunnel` |
+| Tunnel client | `@expo/ngrok` as a devDependency — the container runs as `node` and cannot write npm's global prefix, and `run --rm` discards global installs |
 | Local preview | React Native Web at `localhost:8081` |
 | Repo layout | App at repo root; a backend, if ever needed, becomes a sibling directory |
 | Task runner | `Makefile` wrapping docker-compose |
