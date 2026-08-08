@@ -50,8 +50,9 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "caa442bb-3c13-480c-a76f-4e6f93e22f98"
+        "projectId": "3c83b546-5929-40d2-b821-8329f93347de"
       }
-    }
+    },
+    "owner": "wjapps"
   }
 }
