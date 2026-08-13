@@ -1,9 +1,9 @@
 # Master Plan — Open Currency
 
-> **Status: implementation complete.** The product scope and every architecture
+> **Status: product implementation complete.** The product scope and every architecture
 > decision that blocks the implementation were settled on 2026-07-27. The complete
-> first-version app is implemented on `main`; release-account, device, and CI
-> verification remain operational follow-ups rather than unfinished product work.
+> first-version app is implemented on `main`; production release operations and M08's
+> first connected cloud automation run remain operational follow-ups.
 
 ## 1. Purpose
 
@@ -47,6 +47,8 @@ currently provides:
 - A typed hand-rolled localisation layer covering 27 locales, native date picking
   with a web fallback, accessibility labels, branded assets, and a comprehensive
   Jest/React Native Testing Library suite.
+- An Android Maestro smoke flow covering standalone launch and a EUR-to-USD conversion,
+  with EAS-managed build-and-test configuration for pushes to `main`.
 
 The implementation is feature-complete for the planned first version. A production
 release build has not yet been exercised; release-account, device, and CI verification
@@ -82,10 +84,12 @@ Conventions:
 | M05 | Currency management and historical dates | ✅ Complete | — |
 | M06 | Localisation, settings, polish and release | ✅ Implementation complete (release build pending) | — |
 | M07 | Display settings | ✅ Complete | [M07-display-settings.md](./M07-display-settings.md) |
+| M08 | Maestro mobile automation | 🚧 In progress (first cloud run pending) | [M08-maestro-automation.md](./M08-maestro-automation.md) |
 
 M01–M06 were delivered as one completed feature change after the initial environment
 and planning work. The milestone split remains as a historical index of the
-workstreams; no milestone is still awaiting implementation.
+workstreams; none of those milestones is still awaiting implementation. M08 starts a
+new automation workstream without reopening the completed product scope.
 
 **Ordering rationale.** M03 front-loaded the pure domain layer and runtime capability
 checks because the money representation constrains every screen and Hermes's partial
@@ -102,16 +106,17 @@ localisation, settings, polish, and release configuration.
 | Framework | Expo (managed workflow), SDK 57 |
 | Language | TypeScript, `strict: true` |
 | Runtime | React Native 0.86, React 19.2 |
-| Dev environment | Fully containerised; host needs only docker, docker-compose, git |
-| Device testing | Expo Go over LAN, via `network_mode: host` |
+| Dev environment | Application development is fully containerised. Android Studio, ADB, Java and Maestro CLI are a narrow host-side exception for standalone Android E2E testing |
+| Device testing | Expo Go over LAN via `network_mode: host`; standalone APK smoke testing on an Android API 30 emulator |
 | Local preview | React Native Web at `localhost:8081` |
 | Repo layout | App at repo root; a backend, if ever needed, becomes a sibling directory |
 | Task runner | `Makefile` wrapping docker-compose |
 | Web release build | `expo export --platform web` → static `dist/` |
-| Native release build | EAS Build (cloud) — configured but unexercised |
-| Testing | Jest + `jest-expo` + React Native Testing Library |
+| Native release build | EAS Build (cloud) — preview APK exercised on Android; production store build pending |
+| Testing | Jest + `jest-expo` + React Native Testing Library; Android smoke automation with Maestro |
 | Lint / format | ESLint (`eslint-config-expo`) + Prettier + knip |
 | Quality gate | `make check` — lint, format, typecheck, knip, tests |
+| Mobile CI | EAS Workflows builds a credential-free APK from each push to `main` and runs the Maestro smoke flow; project-owner GitHub connection and first cloud run pending |
 
 ### 4.2 Product and platform
 
@@ -192,7 +197,6 @@ Free, no API key, no rate limits, no attribution requirement.
 | --- | --- |
 | Release | Android `applicationId` and iOS bundle identifier — needed before the first EAS build |
 | Release | Signing, distribution channel, and whether over-the-air updates are used |
-| Quality | CI — still blocked on there being a git remote |
 | Quality | Whether `make check` is enforced by a pre-commit hook |
 | Web | `Swipeable` degrades on web, so currency removal is weak in the preview. Acceptable while web is preview-only; revisit if web ever ships |
 

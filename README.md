@@ -87,6 +87,31 @@ entire local container environment from scratch.
 The development image includes GNU Make so the test suite can verify housekeeping
 target expansion without executing destructive commands.
 
+## Android smoke automation
+
+The standalone Android converter journey is covered by
+[`smoke.yaml`](./.maestro/smoke.yaml). Android Studio's emulator, ADB, Java 17+, and
+Maestro CLI are a narrow host-side exception to the otherwise containerised development
+environment; Node, npm, and Expo commands still run only in Docker.
+
+With an Android emulator booted and the standalone APK installed, verify the target and
+run the smoke flow from the repository root:
+
+```sh
+adb devices
+adb shell pm path me.wjoane.opencurrency
+maestro test .maestro/smoke.yaml
+```
+
+Keep downloaded APKs under the ignored `.artifacts/android/` directory or outside the
+repository. Never commit APKs or signing material.
+
+After the project owner connects this GitHub repository to its EAS project,
+[`android-smoke.yml`](./.eas/workflows/android-smoke.yml) builds a credential-free APK
+from every push to `main` and runs only the Maestro smoke flow on EAS's managed Android
+runner. The existing Jest suite and `make check` remain manual and are not part of this
+workflow.
+
 ## How it works
 
 ```text

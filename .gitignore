@@ -51,3 +51,6 @@ yarn-error.*
 # per-machine Docker Compose tweaks (see README)
 docker-compose.override.yml
 coverage/
+
+# Local build artifacts
+/.artifacts/
