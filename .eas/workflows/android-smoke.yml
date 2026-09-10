@@ -1,0 +1,22 @@
+name: Android Maestro smoke test
+
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  build_android:
+    name: Build Android test APK
+    type: build
+    params:
+      platform: android
+      profile: e2e-test
+
+  maestro_smoke:
+    name: Run Maestro smoke test
+    needs: [build_android]
+    type: maestro
+    params:
+      build_id: ${{ needs.build_android.outputs.build_id }}
+      flow_path:
+        - .maestro/smoke.yaml

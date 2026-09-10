@@ -1,0 +1,28 @@
+appId: me.wjoane.opencurrency
+name: Converter smoke test
+tags:
+  - smoke
+---
+- launchApp:
+    clearState: true
+
+- extendedWaitUntil:
+    visible: 'OpenCurrency'
+    timeout: 30000
+
+- assertVisible: 'EUR'
+- assertVisible: 'USD'
+- assertVisible: 'Settings'
+
+- tapOn: 'Amount in Euro'
+- eraseText
+- inputText: '100'
+
+- assertVisible:
+    text: '100'
+    focused: true
+
+- hideKeyboard
+
+- assertVisible:
+    text: 'US Dollar, [0-9,]+\.[0-9]{2}'
